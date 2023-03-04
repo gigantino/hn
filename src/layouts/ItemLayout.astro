@@ -1,0 +1,42 @@
+---
+import Navigation from "@components/Navigation.astro";
+import Footer from "@components/Footer.astro";
+
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{`${title} - HN`}</title>
+  </head>
+  <body>
+    <body class="min-w-[280px] bg-neutral-900 text-white">
+      <Navigation />
+      <div class="pr-3">
+        <slot />
+      </div>
+      <Footer />
+    </body>
+  </body>
+</html>
+
+<style is:global>
+  p {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+  }
+  code {
+    display: block;
+    margin: 0 0 1em;
+    white-space: pre-wrap;
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+import Item from "./Item.astro";
+import xss from "xss";
+import getRelativeTime from "@modules/getRelativeTime";
+export interface Props {
+  data: any;
+}
+const { data } = Astro.props;
+---
+
+<div class="py-3">
+  <div
+    class={`m-auto flex w-full max-w-screen-md flex-col
+    justify-between border-l border-neutral-500/40 pl-3`}
+  >
+    <div class="flex w-full flex-col break-words rounded-md">
+      <!-- Author, time and title -->
+      <div class="flex flex-col">
+        <div class="text-sm">
+          {"Posted by "}
+          <a href={`/@${data.by}`} class="text-blue-500 hover:underline">
+            {data.by}
+          </a>
+          {`${getRelativeTime(data.time)}`}
+        </div>
+        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-white">
+          {data.title}
+        </a>
+      </div>
+      <!-- Post preview -->
+      {
+        data.text && (
+          <div class="overflow-y-hidden break-words">
+            <p class="break-words-anywhere" set:html={xss(data.text)} />
+          </div>
+        )
+      }
+    </div>
+    <!-- Nested comments (recursive) -->
+    <div class="pl-3">
+      {data.kids && data.kids.map((kid: any) => <Item data={kid} />)}
+    </div>
+  </div>
+</div>

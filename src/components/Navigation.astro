@@ -1,0 +1,44 @@
+---
+type NavLink = {
+  label: string;
+  url: string;
+};
+
+const links: NavLink[] = [
+  {
+    label: "news",
+    url: "/",
+  },
+  {
+    label: "ask",
+    url: "/ask",
+  },
+  {
+    label: "show",
+    url: "/show",
+  },
+];
+
+function isSelected(url: string) {
+  return Astro.url.pathname == url;
+}
+---
+
+<nav class="h-14 w-full border-b border-neutral-500/40 bg-black px-3">
+  <main class="m-auto flex h-full w-full max-w-screen-md items-center justify-between">
+    <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
+    <div class="box-border flex gap-3">
+      {
+        links.map((link) =>
+          isSelected(link.url) ? (
+            <a class="font-bold text-blue-500">{link.label}</a>
+          ) : (
+            <a href={link.url} class="text-blue-500 hover:underline">
+              {link.label}
+            </a>
+          )
+        )
+      }
+    </div>
+  </main>
+</nav>

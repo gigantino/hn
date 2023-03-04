@@ -1,0 +1,28 @@
+---
+import xss from "xss";
+import Layout from "@layouts/Layout.astro";
+
+const { user } = Astro.params;
+
+const req = await fetch(`${import.meta.env.HN_API}/user/${user}.json`);
+const data = await req.json();
+if (!data) return Astro.redirect("/404");
+
+const { id: username, created: createdAt, karma, about, submitted: posts } = data;
+---
+
+<Layout title={`@${username}`}>
+  Username: {username}
+  {
+    about && (
+      <>
+        <br />
+        <div set:html={xss(about)} />
+      </>
+    )
+  }
+  <br />
+  Created: {createdAt}
+  <br />
+  Karma: {karma}
+</Layout>
