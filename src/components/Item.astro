@@ -11,17 +11,17 @@ const { data } = Astro.props;
 <div class="py-3">
   <div
     class={`m-auto flex w-full max-w-screen-md flex-col
-    justify-between border-l border-neutral-500/40 pl-3`}
+    justify-between border-l border-neutral-500/40 pl-4`}
   >
     <div class="flex w-full flex-col break-words rounded-md">
       <!-- Author, time and title -->
       <div class="flex flex-col">
         <div class="text-sm">
-          {"Posted by "}
+          <span>Posted by</span>
           <a href={`/@${data.by}`} class="text-blue-500 hover:underline">
             {data.by}
           </a>
-          {`${getRelativeTime(data.time)}`}
+          <span>{getRelativeTime(data.time)}</span>
         </div>
         <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-white">
           {data.title}
@@ -31,13 +31,13 @@ const { data } = Astro.props;
       {
         data.text && (
           <div class="overflow-y-hidden break-words">
-            <p class="break-words-anywhere" set:html={xss(data.text)} />
+            <p class="p-0" set:html={xss(data.text)} />
           </div>
         )
       }
     </div>
     <!-- Nested comments (recursive) -->
-    <div class="pl-3">
+    <div>
       {data.kids && data.kids.map((kid: any) => <Item data={kid} />)}
     </div>
   </div>

@@ -1,18 +1,21 @@
-// ChatGPT, my almighty saviour
-export default function getRelativeTime(timestamp: number): string {
-  const currentTime = Date.now() / 1000;
-  const secondsAgo = currentTime - timestamp;
+const timeUnits: { unit: Intl.RelativeTimeFormatUnit; duration: number }[] = [
+  { unit: "year", duration: 31536000000 },
+  { unit: "month", duration: 2628000000 },
+  { unit: "day", duration: 86400000 },
+  { unit: "hour", duration: 3600000 },
+  { unit: "minute", duration: 60000 },
+  { unit: "second", duration: 1000 },
+];
 
-  if (secondsAgo < 60) {
-    return `${Math.floor(secondsAgo)} seconds ago`;
-  } else if (secondsAgo < 3600) {
-    const minutesAgo = Math.floor(secondsAgo / 60);
-    return `${minutesAgo} minute${minutesAgo === 1 ? "" : "s"} ago`;
-  } else if (secondsAgo < 86400) {
-    const hoursAgo = Math.floor(secondsAgo / 3600);
-    return `${hoursAgo} hour${hoursAgo === 1 ? "" : "s"} ago`;
-  } else {
-    const daysAgo = Math.floor(secondsAgo / 86400);
-    return `${daysAgo} day${daysAgo === 1 ? "" : "s"} ago`;
-  }
+export default function getRelativeTime(timestamp: number) {
+  const msElapsed = Date.now() - timestamp * 1000;
+  const intlRelativeTimeFormat = new Intl.RelativeTimeFormat("en", { style: "long" });
+  const timeUnit = timeUnits.find(({ duration }) => msElapsed >= duration);
+
+  if (!timeUnit) return "just now";
+
+  const { unit, duration } = timeUnit;
+  const timeElapsed = Math.floor(msElapsed / duration);
+
+  return intlRelativeTimeFormat.format(-timeElapsed, unit);
 }
