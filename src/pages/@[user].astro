@@ -1,6 +1,7 @@
 ---
 import xss from "xss";
 import Layout from "@layouts/Layout.astro";
+import getRelativeTime from "@modules/getRelativeTime";
 
 const { user } = Astro.params;
 
@@ -12,17 +13,39 @@ const { id: username, created: createdAt, karma, about, submitted: posts } = dat
 ---
 
 <Layout title={`@${username}`}>
-  Username: {username}
+  <span>
+    <b>Username:</b>
+    <span>{username}</span>
+  </span>
+
   {
     about && (
-      <>
-        <br />
+      <span>
+        <b>About:</b>
         <div set:html={xss(about)} />
-      </>
+      </span>
     )
   }
-  <br />
-  Created: {createdAt}
-  <br />
-  Karma: {karma}
+
+  <span>
+    <b>Joined HN:</b>
+    <span>{getRelativeTime(createdAt)}</span>
+  </span>
+
+  <span>
+    <b>Karma:</b>
+    <span>{karma}</span>
+  </span>
 </Layout>
+
+<style is:global>
+  p {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+  }
+  code {
+    display: block;
+    margin: 0 0 1em;
+    white-space: pre-wrap;
+  }
+</style>

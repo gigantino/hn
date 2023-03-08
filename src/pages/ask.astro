@@ -1,20 +1,33 @@
 ---
 import ItemPreview from "@components/ItemPreview.astro";
 import Layout from "@layouts/Layout.astro";
+import getPage from "@modules/getPage";
 
 const req = await fetch(`${import.meta.env.HN_API}/askstories.json`);
+const page = getPage(Astro);
+
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
 const posts = await Promise.all(
-  data.map((id) =>
-    fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-  )
+  data
+    .splice(20 * (page - 1), 20)
+    .map((id) =>
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
+    )
 );
+
+if (posts.length == 0) return Astro.redirect("/404");
+const isLastPage = posts.length < 20;
 ---
 
 <Layout title="Ask">
-  <div class="flex flex-col gap-3">
-    {posts.map((post) => <ItemPreview data={post} />)}
-  </div>
+  {posts.map((post) => <ItemPreview data={post} />)}
+  {
+    !isLastPage && (
+      <div class="flex w-full justify-center gap-3">
+        <a href={`/ask/?p=${page + 1}`}>View more</a>
+      </div>
+    )
+  }
 </Layout>

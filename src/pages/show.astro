@@ -1,8 +1,11 @@
 ---
 import ItemPreview from "@components/ItemPreview.astro";
+import getPage from "@modules/getPage";
 import Layout from "@layouts/Layout.astro";
 
 const req = await fetch(`${import.meta.env.HN_API}/showstories.json`);
+const page = getPage(Astro);
+
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
@@ -11,10 +14,21 @@ const posts = await Promise.all(
     fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
   )
 );
+
+if (posts.length == 0) return Astro.redirect("/404");
+const isLastPage = posts.length < 20;
 ---
 
 <Layout title="Show">
   <div class="flex flex-col gap-3">
     {posts.map((post) => <ItemPreview data={post} />)}
   </div>
+
+  {
+    !isLastPage && (
+      <div class="flex w-full justify-center gap-3">
+        <a href={`/show/?p=${page + 1}`}>View more</a>
+      </div>
+    )
+  }
 </Layout>
