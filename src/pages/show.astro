@@ -10,9 +10,11 @@ const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
 const posts = await Promise.all(
-  data.map((id) =>
-    fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-  )
+  data
+    .splice(20 * (page - 1), 20)
+    .map((id) =>
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
+    )
 );
 
 if (posts.length == 0) return Astro.redirect("/404");
