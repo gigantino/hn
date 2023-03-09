@@ -7,7 +7,7 @@ export interface Props {
 }
 const { data } = Astro.props;
 
-export function extractDomainFromLink(link: string) {
+function extractDomainFromLink(link: string) {
   try {
     const url = new URL(link);
     const hostnameParts = url.hostname.split(".");
@@ -22,43 +22,42 @@ export function extractDomainFromLink(link: string) {
 ---
 
 <main class="rounded-md border border-neutral-500/40 bg-black">
-  <div class="flex flex-nowrap">
-    <div class="flex h-full w-12 flex-col justify-center gap-3 p-3">
-      <!-- Upvotes -->
-      <div class="flex w-full flex-col items-center gap-1">
-        <img src="/icons/upvote.svg" alt="upvote" />
-        <span class="text-sm font-bold">{data.score}</span>
-      </div>
-    </div>
-    <div class="flex w-full flex-col gap-2 break-words border-l border-neutral-500/40 p-3">
-      <!-- Author, time and title -->
-      <div class="flex flex-col gap-1">
-        <div class="text-sm">
-          {"Posted by "}
-          <a href={`/@${data.by}`}>
-            {data.by}
-          </a>
-          {` ${getRelativeTime(data.time)}`}
-        </div>
-        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-white">
-          {data.title}
+  <div class="flex w-full flex-col gap-2 break-words p-3">
+    <!-- Author, time and title -->
+    <div class="flex flex-col gap-1">
+      <div class="text-sm">
+        {"Posted by "}
+        <a href={`/@${data.by}`}>
+          {data.by}
         </a>
+        {` ${getRelativeTime(data.time)}`}
       </div>
-      <hr class="border-neutral-500/40" />
-      <!-- Comments and preview url -->
-      <p class="flex flex-wrap items-center gap-3 text-sm">
+      <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold">
+        {data.title}
+      </a>
+      <!-- External URL -->
+      {
+        data.url && (
+          <span class="flex items-center gap-1 break-all text-sm">
+            {extractDomainFromLink(data.url)}
+            <img src="/icons/link.svg" alt="External link" />
+          </span>
+        )
+      }
+    </div>
+    <hr class="border-neutral-500/40" />
+    <!-- Upvotes and comments -->
+    <div class="flex flex-wrap items-center gap-3 text-sm">
+      <div class="flex gap-1">
+        <img src="/icons/upvote.svg" alt="upvote" />
+        <span>{data.score}</span>
+      </div>
+      <div class="flex gap-1">
+        <img src="/icons/comment.svg" alt="comment" />
         <a class="cursor-pointer text-blue-500 hover:underline" href={`/item/${data.id}`}>
           {`${data.descendants | 0} ${data.descendants == 1 ? "comment" : "comments"}`}
         </a>
-        {
-          data.url && (
-            <span class="flex items-center gap-1 break-all">
-              {extractDomainFromLink(data.url)}
-              <img src="/icons/link.svg" alt="External link" />
-            </span>
-          )
-        }
-      </p>
+      </div>
     </div>
   </div>
 </main>
