@@ -10,11 +10,10 @@ const { data } = Astro.props;
 
 <div class="py-3">
   <div
-    class={`m-auto flex w-full max-w-screen-md flex-col
-    justify-between border-l border-neutral-500/40 pl-4`}
+    class="m-auto flex w-full max-w-screen-md flex-col justify-between"
   >
-    <div class="flex w-full flex-col break-words rounded-md">
-      <!-- Author and time -->
+    <div class="flex w-full flex-col break-words ">
+      <!-- Author, time and title -->
       <div class="flex flex-col">
         <div class="text-sm">
           <span>Posted by</span>
@@ -23,8 +22,11 @@ const { data } = Astro.props;
           </a>
           <span>{getRelativeTime(data.time)}</span>
         </div>
+        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-white">
+          {data.title}
+        </a>
       </div>
-      <!-- Post preview -->
+      <!-- Post description -->
       {
         data.text && (
           <div class="overflow-y-hidden break-words">
@@ -32,6 +34,19 @@ const { data } = Astro.props;
           </div>
         )
       }
+    </div>
+    <!-- Upvotes and comments -->
+    <div class="flex flex-wrap items-center gap-3 text-sm py-3">
+      <div class="flex gap-1">
+        <img src="/icons/upvote.svg" alt="upvote" />
+        <span>{data.score}</span>
+      </div>
+      <div class="flex gap-1">
+        <img src="/icons/comment.svg" alt="comment" />
+        <span>
+          {`${data.descendants | 0} ${data.descendants == 1 ? "comment" : "comments"}`}
+        </span>
+      </div>
     </div>
     <!-- Nested comments (recursive) -->
     <div>

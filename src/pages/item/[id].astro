@@ -1,6 +1,7 @@
 ---
 import ItemLayout from "@layouts/ItemLayout.astro";
 import Item from "@components/Item.astro";
+import Story from "@components/Story.astro";
 
 const { id } = Astro.params;
 
@@ -55,5 +56,6 @@ if (!data) return Astro.redirect("/404");
 ---
 
 <ItemLayout title={data.title}>
-  <Item data={data} />
+   {data.type == "story" ? <Story data={data} /> : 
+  <Item data={data} /> }
 </ItemLayout>
