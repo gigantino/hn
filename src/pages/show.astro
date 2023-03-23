@@ -1,21 +1,18 @@
 ---
-import ItemPreview from "@components/ItemPreview.astro";
-import getPage from "@modules/getPage";
 import Layout from "@layouts/Layout.astro";
+import ItemPreview from "@components/ItemPreview.astro";
+import Pagination from "@components/Pagination.astro";
+import getPage from "@modules/getPage";
+import getPosts from "@modules/getPosts";
 
 const req = await fetch(`${import.meta.env.HN_API}/showstories.json`);
 const page = getPage(Astro);
+const filter = Astro.url.searchParams.get("filter");
 
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
-const posts = await Promise.all(
-  data
-    .splice(20 * (page - 1), 20)
-    .map((id) =>
-      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-    )
-);
+const posts = await getPosts(data, filter, page);
 
 if (posts.length == 0) return Astro.redirect("/404");
 const isLastPage = posts.length < 20;
@@ -26,11 +23,5 @@ const isLastPage = posts.length < 20;
     {posts.map((post) => <ItemPreview data={post} />)}
   </div>
 
-  {
-    !isLastPage && (
-      <div class="flex w-full justify-center gap-3">
-        <a href={`/show/?p=${page + 1}`}>View more</a>
-      </div>
-    )
-  }
+  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
 </Layout>

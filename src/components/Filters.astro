@@ -1,0 +1,66 @@
+---
+const filter = Astro.url.searchParams.get("filter");
+const page = Astro.url.searchParams.get("page");
+
+type Category = {
+  label: string;
+  icon: string;
+  filter: string | null;
+};
+
+const categories: Category[] = [
+  {
+    label: "Trending",
+    icon: "/icons/star.svg",
+    filter: null,
+  },
+  {
+    label: "Most upvoted",
+    icon: "/icons/upvote.svg",
+    filter: "top",
+  },
+  {
+    label: "Newest",
+    icon: "/icons/clock.svg",
+    filter: "new",
+  },
+];
+
+// Create the URL without losing the current page
+function linkFromCategory(category: Category) {
+  console.log(category);
+  let url = Astro.url.pathname;
+  if (page) url += `/?page=${page}&`;
+  if (category.filter) url += `/?filter=${category.filter}`;
+  else if (filter) return url;
+  else url = url.slice(0, -1);
+
+  return url.replace("//", "/").replace("&/?", "&");
+}
+
+function isSelected(category: Category) {
+  return filter == category.filter;
+}
+---
+
+<div class="flex gap-3 justify-center text-sm sm:justify-start sm:text-base">
+  {
+    categories.map((category) =>
+      isSelected(category) ? (
+        <a class="hover:no-underline hover:cursor-default">
+          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
+            <img src={category.icon} alt="upvote" />
+            <span class="font-bold">{category.label}</span>
+          </div>
+        </a>
+      ) : (
+        <a href={linkFromCategory(category)}>
+          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
+            <img src={category.icon} alt="upvote" />
+            <span>{category.label}</span>
+          </div>
+        </a>
+      )
+    )
+  }
+</div>

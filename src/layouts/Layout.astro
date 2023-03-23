@@ -1,5 +1,6 @@
 ---
 import Navigation from "@components/Navigation.astro";
+import Filters from "@components/Filters.astro";
 import Footer from "@components/Footer.astro";
 
 export interface Props {
@@ -19,11 +20,13 @@ const { title } = Astro.props;
     <title>{`${title} - HN`}</title>
   </head>
   <body>
-    <body class="min-w-[280px] bg-neutral-900 text-white">
+    <body class="min-w-fold bg-neutral-900 text-white">
       <Navigation />
       <main
         class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-neutral-500/40 p-3 md:border-x"
       >
+        <!-- Show filters on all pages using this layout other than profiles -->
+        {!Astro.url.pathname.startsWith("/@") && <Filters />}
         <slot />
       </main>
       <Footer />

@@ -1,7 +1,10 @@
 ---
-import Item from "./Item.astro";
 import xss from "xss";
+
+import Item from "@components/Item.astro";
 import getRelativeTime from "@modules/getRelativeTime";
+import extractDomainFromLink from "@modules/extractDomainFromLink";
+
 export interface Props {
   data: any;
 }
@@ -9,10 +12,8 @@ const { data } = Astro.props;
 ---
 
 <div class="py-3">
-  <div
-    class="m-auto flex w-full max-w-screen-md flex-col justify-between"
-  >
-    <div class="flex w-full flex-col break-words ">
+  <div class="m-auto flex w-full max-w-screen-md flex-col justify-between">
+    <div class="flex w-full flex-col break-words">
       <!-- Author, time and title -->
       <div class="flex flex-col">
         <div class="text-sm">
@@ -26,6 +27,15 @@ const { data } = Astro.props;
           {data.title}
         </a>
       </div>
+      <!-- External URL -->
+      {
+        data.url && (
+          <span class="flex items-center gap-1 break-all text-sm">
+            {extractDomainFromLink(data.url)}
+            <img src="/icons/link.svg" alt="External link" />
+          </span>
+        )
+      }
       <!-- Post description -->
       {
         data.text && (
@@ -39,12 +49,14 @@ const { data } = Astro.props;
     <div class="flex flex-wrap items-center gap-3 text-sm py-3">
       <div class="flex gap-1">
         <img src="/icons/upvote.svg" alt="upvote" />
-        <span>{data.score}</span>
+        <span>
+          {data.score | 0}
+        </span>
       </div>
       <div class="flex gap-1">
         <img src="/icons/comment.svg" alt="comment" />
         <span>
-          {`${data.descendants | 0} ${data.descendants == 1 ? "comment" : "comments"}`}
+          {data.descendants | 0}
         </span>
       </div>
     </div>

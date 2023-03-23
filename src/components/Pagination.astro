@@ -1,0 +1,22 @@
+---
+export interface Props {
+  isLastPage: boolean;
+  page: number;
+  filter: string | null;
+}
+const { isLastPage, page, filter } = Astro.props;
+
+// Create the URL without losing the current filters
+let url = `${Astro.url.pathname}/?page=${page + 1}`.replace("//", "/");
+if (filter) url += `&filter=${filter}`;
+---
+
+{
+  !isLastPage && (
+    <div class="flex w-full justify-center gap-3">
+      <a href={url} class="w-full text-center">
+        View more
+      </a>
+    </div>
+  )
+}

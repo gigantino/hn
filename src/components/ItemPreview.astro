@@ -1,27 +1,14 @@
 ---
-import xss from "xss";
 import getRelativeTime from "@modules/getRelativeTime";
+import extractDomainFromLink from "@modules/extractDomainFromLink";
 
 export interface Props {
   data: any;
 }
 const { data } = Astro.props;
-
-function extractDomainFromLink(link: string) {
-  try {
-    const url = new URL(link);
-    const hostnameParts = url.hostname.split(".");
-    if (hostnameParts.length >= 3) {
-      hostnameParts.shift();
-    }
-    return hostnameParts.join(".");
-  } catch (error) {
-    return undefined;
-  }
-}
 ---
 
-<main class="rounded-md border border-neutral-500/40 bg-black">
+<div class="rounded-md border border-neutral-500/40 bg-black">
   <div class="flex w-full flex-col gap-2 break-words p-3">
     <!-- Author, time and title -->
     <div class="flex flex-col gap-1">
@@ -60,4 +47,4 @@ function extractDomainFromLink(link: string) {
       </div>
     </div>
   </div>
-</main>
+</div>
