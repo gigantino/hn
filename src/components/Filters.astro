@@ -28,7 +28,6 @@ const categories: Category[] = [
 
 // Create the URL without losing the current page
 function linkFromCategory(category: Category) {
-  console.log(category);
   let url = Astro.url.pathname;
   if (page) url += `/?page=${page}&`;
   if (category.filter) url += `/?filter=${category.filter}`;

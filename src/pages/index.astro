@@ -3,16 +3,35 @@ import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
-import getPosts from "@modules/getPosts";
 
-const req = await fetch(`${import.meta.env.HN_API}/topstories.json`);
 const page = getPage(Astro);
 const filter = Astro.url.searchParams.get("filter");
+
+let requestUrl = import.meta.env.HN_API;
+switch (filter) {
+  case "new":
+    requestUrl += "/newstories.json";
+    break;
+  case "top":
+    requestUrl += "/beststories.json";
+    break;
+  default:
+    requestUrl += "/topstories.json";
+    break;
+}
+
+const req = await fetch(requestUrl);
 
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
-const posts = await getPosts(data, filter, page);
+const posts = await Promise.all(
+  data
+    .splice(20 * (page - 1), 20)
+    .map((id) =>
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
+    )
+);
 
 if (posts.length == 0) return Astro.redirect("/404");
 const isLastPage = posts.length < 20;
