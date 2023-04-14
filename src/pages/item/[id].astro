@@ -55,6 +55,6 @@ const data = await getPostComments(Number(id));
 if (!data) return Astro.redirect("/404");
 ---
 
-<ItemLayout title={data.title ? data.title : `Item ${data.id}`}>
+<ItemLayout title={data.title ? data.title : `Item ${data.id}`} description={data.text}>
   {data.type == "story" ? <Story data={data} /> : <Item data={data} />}
 </ItemLayout>
