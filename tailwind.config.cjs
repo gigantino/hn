@@ -12,7 +12,7 @@ module.exports = {
     },
   },
   plugins: [
-    function ({ addBase, theme }) {
+    ({ addBase, theme }) => {
       addBase({
         "a": {
           color: theme("colors.blue.500"),

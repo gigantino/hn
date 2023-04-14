@@ -7,7 +7,7 @@ const timeUnits: { unit: Intl.RelativeTimeFormatUnit; duration: number }[] = [
   { unit: "second", duration: 1000 },
 ];
 
-export default function getRelativeTime(timestamp: number) {
+const getRelativeTime = (timestamp: number) => {
   const msElapsed = Date.now() - timestamp * 1000;
   const intlRelativeTimeFormat = new Intl.RelativeTimeFormat("en", { style: "long" });
   const timeUnit = timeUnits.find(({ duration }) => msElapsed >= duration);
@@ -18,4 +18,6 @@ export default function getRelativeTime(timestamp: number) {
   const timeElapsed = Math.floor(msElapsed / duration);
 
   return intlRelativeTimeFormat.format(-timeElapsed, unit);
-}
+};
+
+export default getRelativeTime;

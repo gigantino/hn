@@ -1,4 +1,4 @@
-export default function extractDomainFromLink(link: string) {
+const extractDomainFromLink = (link: string) => {
   try {
     const url = new URL(link);
     const hostnameParts = url.hostname.split(".");
@@ -9,4 +9,6 @@ export default function extractDomainFromLink(link: string) {
   } catch (error) {
     return undefined;
   }
-}
+};
+
+export default extractDomainFromLink;

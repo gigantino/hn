@@ -1,4 +1,4 @@
-export default async function getPosts(data: number[], filter: string | null, page: number) {
+const getPosts = async (data: number[], filter: string | null, page: number) => {
   if (filter == "new" || filter == "top") {
     const posts = await Promise.all(
       data.map((id) =>
@@ -18,4 +18,6 @@ export default async function getPosts(data: number[], filter: string | null, pa
     );
     return posts;
   }
-}
+};
+
+export default getPosts;

@@ -2,16 +2,13 @@
 import Navigation from "@components/Navigation.astro";
 import Filters from "@components/Filters.astro";
 import Footer from "@components/Footer.astro";
+import getMetaTags from "@modules/getMetaTags";
 
 export interface Props {
   title: string;
 }
 
-const { title: rawTitle } = Astro.props;
-
-const title = `${rawTitle} - HN`;
-const description =
-  "Hacker News is a social news website that provides the latest updates on technology and computer science. Stay informed about the latest news and discussions from the tech industry.";
+const { title, description } = getMetaTags(Astro.props.title);
 ---
 
 <!DOCTYPE html>

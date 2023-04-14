@@ -14,7 +14,7 @@ interface Comment {
   kids?: Comment[];
 }
 
-async function getPostComments(postId: number) {
+const getPostComments = async (postId: number) => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${postId}.json`);
   const post = await response.json();
 
@@ -28,9 +28,9 @@ async function getPostComments(postId: number) {
   post.kids = kids;
 
   return post;
-}
+};
 
-async function getComment(commentId: number) {
+const getComment = async (commentId: number) => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${commentId}.json`);
   const comment = await response.json();
 
@@ -49,7 +49,7 @@ async function getComment(commentId: number) {
     score: comment.score,
     kids: nestedComments.filter((comment) => comment) as Comment[],
   };
-}
+};
 
 const data = await getPostComments(Number(id));
 if (!data) return Astro.redirect("/404");

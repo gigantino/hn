@@ -27,7 +27,7 @@ const categories: Category[] = [
 ];
 
 // Create the URL without losing the current page
-function linkFromCategory(category: Category) {
+const linkFromCategory = (category: Category) => {
   let url = Astro.url.pathname;
   if (page) url += `/?page=${page}&`;
   if (category.filter) url += `/?filter=${category.filter}`;
@@ -35,11 +35,11 @@ function linkFromCategory(category: Category) {
   else url = url.slice(0, -1);
 
   return url.replace("//", "/").replace("&/?", "&");
-}
+};
 
-function isSelected(category: Category) {
+const isSelected = (category: Category) => {
   return filter == category.filter;
-}
+};
 ---
 
 <div class="flex gap-3 justify-center text-sm sm:justify-start sm:text-base">
