@@ -9,7 +9,7 @@ const { query } = Astro.props;
 <form class="flex w-full justify-center" method="get" action="/search">
   <input
     type="text"
-    class="w-96 rounded-l-md border border-neutral-500/40 bg-black p-1 pl-3 pr-3 focus:outline-none"
+    class="rounded-l-md border border-neutral-500/40 bg-black p-1 pl-3 pr-3 focus:outline-none md:w-96"
     placeholder="Search..."
     name="q"
     value={query}
