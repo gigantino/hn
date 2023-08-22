@@ -29,7 +29,11 @@ const { title, description } = getMetaTags(Astro.props.title);
         class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-neutral-500/40 p-3 md:border-x"
       >
         <!-- Show filters on all pages using this layout other than profiles -->
-        {!Astro.url.pathname.startsWith("/@") && <Filters />}
+        {
+          !Astro.url.pathname.startsWith("/@") && !Astro.url.pathname.startsWith("/search") && (
+            <Filters />
+          )
+        }
         <slot />
       </main>
       <Footer />

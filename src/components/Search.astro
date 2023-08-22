@@ -1,0 +1,31 @@
+---
+interface Props {
+  query?: string;
+}
+
+const { query } = Astro.props;
+---
+
+<form class="flex w-full justify-center" method="get" action="/search">
+  <input
+    type="text"
+    class="w-96 rounded-l-md border border-neutral-500/40 bg-black p-1 pl-3 pr-3 focus:outline-none"
+    placeholder="Search..."
+    name="q"
+    value={query}
+  />
+  <button type="submit" class="rounded-r-md border border-neutral-500/40">
+    <svg
+      stroke="currentColor"
+      fill="currentColor"
+      stroke-width="0"
+      viewBox="0 0 24 24"
+      class="ml-2 mr-2 h-5 w-5"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"
+      ></path>
+    </svg>
+  </button>
+</form>

@@ -1,0 +1,17 @@
+---
+import Layout from "@layouts/Layout.astro";
+import ItemPreview from "@components/ItemPreview.astro";
+import makeSearch from "@modules/makeSearch";
+
+const query = Astro.url.searchParams.get("q");
+const posts = await makeSearch(query);
+---
+
+<Layout title={`${query} on HackerNews`}>
+  {posts.map((post) => { 
+      if (!post.title) return;
+    
+      return <ItemPreview data={post} />
+    }
+  )}
+</Layout>
