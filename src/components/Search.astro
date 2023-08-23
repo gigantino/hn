@@ -1,0 +1,21 @@
+---
+interface Props {
+  query?: string;
+}
+
+const { query } = Astro.props;
+---
+
+<form class="flex w-full justify-center" method="get" action="/search">
+  <input
+    type="text"
+    class="w-full rounded-tl-md border-y border-l border-neutral-500/40 bg-black p-1 pl-3 pr-3 focus:outline-none"
+    placeholder="Search..."
+    name="q"
+    id="q"
+    value={query}
+  />
+  <button type="submit" class="rounded-tr-md border border-neutral-500/40 p-2">
+    <img src="/icons/search.svg" alt="search" />
+  </button>
+</form>

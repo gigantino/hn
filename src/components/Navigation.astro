@@ -1,5 +1,7 @@
 ---
 const filter = Astro.url.searchParams.get("filter");
+const q = Astro.url.searchParams.get("q");
+const isSearch = Astro.url.pathname.startsWith("/search");
 
 type NavLink = {
   label: string;
@@ -29,7 +31,11 @@ const isSelected = (url: string) => {
 <nav class="h-14 w-full border-b border-neutral-500/40 bg-black px-3">
   <main class="m-auto flex h-full w-full max-w-screen-md items-center justify-between">
     <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
-    <div class="box-border flex gap-3">
+    <div
+      class={!isSearch
+        ? "box-border flex items-center gap-3"
+        : "hidden md:box-border md:items-center md:gap-3 md:flex"}
+    >
       {
         links.map((link) =>
           isSelected(link.url) ? (
@@ -39,6 +45,9 @@ const isSelected = (url: string) => {
           )
         )
       }
+      <label for="q" class="block rounded-md border border-neutral-500/40 p-2 text-white">
+        <img src="/icons/search.svg" alt="search" />
+      </label>
     </div>
   </main>
 </nav>
