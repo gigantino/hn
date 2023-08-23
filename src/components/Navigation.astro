@@ -1,6 +1,4 @@
 ---
-import Search from "./Search.astro";
-
 const filter = Astro.url.searchParams.get("filter");
 const q = Astro.url.searchParams.get("q");
 const isSearch = Astro.url.pathname.startsWith("/search");
