@@ -19,4 +19,4 @@ The main instance can be found [here](https://hn.gigantino.dev).
 
 ## License
 
-This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
+This project is licensed under the MIT License - see [LICENSE.md](LICENSE) for details.
