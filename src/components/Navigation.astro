@@ -1,6 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
 const filter = Astro.url.searchParams.get("filter");
-const q = Astro.url.searchParams.get("q");
 const isSearch = Astro.url.pathname.startsWith("/search");
 
 type NavLink = {
@@ -45,8 +45,11 @@ const isSelected = (url: string) => {
           )
         )
       }
-      <label for="q" class="block rounded-md border border-neutral-500/40 p-2 text-white cursor-pointer">
-        <img src="/icons/search.svg" alt="search" />
+      <label
+        for="q"
+        class="block cursor-pointer rounded-md border border-neutral-500/40 p-2 text-white"
+      >
+        <Icon name="search" class="h-5 w-5" />
       </label>
     </div>
   </main>

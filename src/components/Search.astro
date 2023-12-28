@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 interface Props {
   query?: string;
 }
@@ -16,6 +17,6 @@ const { query } = Astro.props;
     value={query}
   />
   <button type="submit" class="rounded-tr-md border border-neutral-500/40 p-2">
-    <img src="/icons/search.svg" alt="search" />
+    <Icon name="search" class="h-5 w-5" />
   </button>
 </form>

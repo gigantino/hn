@@ -7,7 +7,7 @@ module.exports = {
         "xs": "480px",
       },
       minWidth: {
-        "fold": "280px", // Galaxy Fold
+        "fold": "280px",
       },
     },
   },

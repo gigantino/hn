@@ -1,65 +1,32 @@
 ---
-const filter = Astro.url.searchParams.get("filter");
-const page = Astro.url.searchParams.get("page");
+import { Icon } from "astro-icon/components";
 
-type Category = {
-  label: string;
-  icon: string;
-  filter: string | null;
-};
-
-const categories: Category[] = [
+const categories = [
   {
     label: "Trending",
-    icon: "/icons/star.svg",
+    icon: "star",
     filter: null,
   },
   {
     label: "Most upvoted",
-    icon: "/icons/upvote.svg",
+    icon: "upvote",
     filter: "top",
   },
   {
     label: "Newest",
-    icon: "/icons/clock.svg",
+    icon: "clock",
     filter: "new",
   },
 ];
-
-// Create the URL without losing the current page
-const linkFromCategory = (category: Category) => {
-  let url = Astro.url.pathname;
-  if (page) url += `/?page=${page}&`;
-  if (category.filter) url += `/?filter=${category.filter}`;
-  else if (filter) return url;
-  else url = url.slice(0, -1);
-
-  return url.replace("//", "/").replace("&/?", "&");
-};
-
-const isSelected = (category: Category) => {
-  return filter == category.filter;
-};
 ---
 
-<div class="flex gap-3 justify-center text-sm sm:justify-start sm:text-base">
+<div class="flex justify-center gap-3 text-sm sm:justify-start sm:text-base">
   {
-    categories.map((category) =>
-      isSelected(category) ? (
-        <a class="hover:no-underline hover:cursor-default">
-          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
-            <img src={category.icon} alt="upvote" />
-            <span class="font-bold">{category.label}</span>
-          </div>
-        </a>
-      ) : (
-        <a href={linkFromCategory(category)}>
-          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
-            <img src={category.icon} alt="upvote" />
-            <span>{category.label}</span>
-          </div>
-        </a>
-      )
-    )
+    categories.map((c) => (
+      <a href="" class="flex items-center justify-center gap-1">
+        <Icon name={c.icon} class="h-5 w-5" />
+        <span>{c.label}</span>
+      </a>
+    ))
   }
 </div>

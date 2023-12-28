@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
 
@@ -27,7 +28,7 @@ const { data } = Astro.props;
         data.url && (
           <span class="flex items-center gap-1 break-all text-sm">
             {extractDomainFromLink(data.url)}
-            <img src="/icons/link.svg" alt="External link" />
+            <Icon name="link" class="h-5 w-5" />
           </span>
         )
       }
@@ -35,12 +36,12 @@ const { data } = Astro.props;
     <hr class="border-neutral-500/40" />
     <!-- Upvotes and comments -->
     <div class="flex flex-wrap items-center gap-3 text-sm">
-      <div class="flex gap-1">
-        <img src="/icons/upvote.svg" alt="upvote" />
+      <div class="flex items-center gap-1">
+        <Icon name="upvote" class="h-5 w-5" />
         <span>{data.score}</span>
       </div>
-      <div class="flex gap-1">
-        <img src="/icons/comment.svg" alt="comment" />
+      <div class="flex items-center gap-1">
+        <Icon name="comment" class="h-5 w-5" />
         <a class="cursor-pointer text-blue-500 hover:underline" href={`/item/${data.id}`}>
           {`${data.descendants | 0} ${data.descendants == 1 ? "comment" : "comments"}`}
         </a>

@@ -1,4 +1,5 @@
 ---
+import { Icon } from "astro-icon/components";
 import xss from "xss";
 
 import Item from "@components/Item.astro";
@@ -32,7 +33,7 @@ const { data } = Astro.props;
         data.url && (
           <span class="flex items-center gap-1 break-all text-sm">
             {extractDomainFromLink(data.url)}
-            <img src="/icons/link.svg" alt="External link" />
+            <Icon name="link" class="h-5 w-5" />
           </span>
         )
       }
@@ -46,15 +47,15 @@ const { data } = Astro.props;
       }
     </div>
     <!-- Upvotes and comments -->
-    <div class="flex flex-wrap items-center gap-3 text-sm py-3">
-      <div class="flex gap-1">
-        <img src="/icons/upvote.svg" alt="upvote" />
+    <div class="flex flex-wrap items-center gap-3 py-3 text-sm">
+      <div class="flex items-center gap-1">
+        <Icon name="upvote" class="h-5 w-5" />
         <span>
           {data.score | 0}
         </span>
       </div>
-      <div class="flex gap-1">
-        <img src="/icons/comment.svg" alt="comment" />
+      <div class="flex items-center gap-1">
+        <Icon name="comment" class="h-5 w-5" />
         <span>
           {data.descendants | 0}
         </span>
