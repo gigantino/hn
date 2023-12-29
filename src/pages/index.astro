@@ -23,17 +23,17 @@ switch (filter) {
 const req = await fetch(requestUrl);
 
 const data: undefined | number[] = await req.json();
-if (!data) throw Astro.redirect("/404");
+if (!data) return Astro.redirect("/404");
 
 const posts = await Promise.all(
   data
     .splice(20 * (page - 1), 20)
     .map((id) =>
-      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-    )
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
+    ),
 );
 
-if (posts.length === 0) throw Astro.redirect("/404");
+if (posts.length === 0) return Astro.redirect("/404");
 
 const isLastPage = posts.length < 20;
 ---

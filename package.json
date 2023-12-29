@@ -19,9 +19,9 @@
     "xss": "^1.0.14"
   },
   "devDependencies": {
-    "prettier": "^2.8.8",
-    "prettier-plugin-astro": "^0.8.1",
-    "prettier-plugin-organize-imports": "^3.2.3",
-    "prettier-plugin-tailwindcss": "^0.2.8"
+    "prettier": "^3.1.1",
+    "prettier-plugin-astro": "^0.12.3",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-tailwindcss": "^0.5.10"
   }
 }
