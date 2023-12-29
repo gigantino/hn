@@ -10,7 +10,7 @@ const makeSearch = async (query: string) => {
       descendants: d.num_comments,
       url: d.url,
       time: new Date(d.created_at).getTime() / 1000,
-    }
+    };
   });
 };
 

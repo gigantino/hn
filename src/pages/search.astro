@@ -8,10 +8,11 @@ const posts = await makeSearch(query);
 ---
 
 <Layout title={`${query} on HackerNews`}>
-  {posts.map((post) => { 
+  {
+    posts.map((post) => {
       if (!post.title) return;
-    
-      return <ItemPreview data={post} />
-    }
-  )}
+
+      return <ItemPreview data={post} />;
+    })
+  }
 </Layout>

@@ -4,17 +4,17 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        "xs": "480px",
+        xs: "480px",
       },
       minWidth: {
-        "fold": "280px",
+        fold: "280px",
       },
     },
   },
   plugins: [
     ({ addBase, theme }) => {
       addBase({
-        "a": {
+        a: {
           color: theme("colors.blue.500"),
           cursor: "pointer",
         },
