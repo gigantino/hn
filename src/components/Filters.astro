@@ -1,5 +1,9 @@
 ---
+import url from "url";
 import { Icon } from "astro-icon/components";
+
+const currentFilter = Astro.url.searchParams.get("filter");
+const currentPage = Astro.url.searchParams.get("page");
 
 const categories = [
   {
@@ -18,12 +22,24 @@ const categories = [
     filter: "new",
   },
 ];
+
+const getUrl = (filter: string | null) => {
+  const parsedUrl = url.parse(Astro.url.pathname, true);
+  if (currentPage) parsedUrl.query["page"] = currentPage;
+  if (filter) parsedUrl.query["filter"] = filter;
+  return url.format(parsedUrl);
+};
 ---
 
 <div class="flex justify-center gap-3 text-sm sm:justify-start sm:text-base">
   {
     categories.map((c) => (
-      <a href="" class="flex items-center justify-center gap-1">
+      <a
+        href={getUrl(c.filter)}
+        class={`${
+          currentFilter === c.filter && "font-bold"
+        } flex items-center justify-center gap-1`}
+      >
         <Icon name={c.icon} class="h-5 w-5" />
         <span>{c.label}</span>
       </a>
