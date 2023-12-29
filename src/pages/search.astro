@@ -10,7 +10,7 @@ const posts = await algoliaSearch(query);
 if (!posts) return Astro.redirect("/404");
 ---
 
-<Layout title={`${query} on HackerNews`}>
+<Layout title={query}>
   {
     posts.map((post) => {
       if (!post.title) return;
