@@ -23,7 +23,7 @@ switch (filter) {
 const req = await fetch(requestUrl);
 
 const data: undefined | number[] = await req.json();
-if (!data) return Astro.redirect("/404");
+if (!data) throw Astro.redirect("/404");
 
 const posts = await Promise.all(
   data
@@ -33,7 +33,8 @@ const posts = await Promise.all(
     )
 );
 
-if (posts.length == 0) return Astro.redirect("/404");
+if (posts.length === 0) throw Astro.redirect("/404");
+
 const isLastPage = posts.length < 20;
 ---
 
@@ -41,5 +42,5 @@ const isLastPage = posts.length < 20;
   <div class="flex flex-col gap-3">
     {posts.map((post) => post.type == "story" && <ItemPreview data={post} />)}
   </div>
-  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
+  {!isLastPage && <Pagination />}
 </Layout>

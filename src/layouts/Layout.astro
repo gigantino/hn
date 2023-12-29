@@ -9,6 +9,12 @@ export interface Props {
 }
 
 const { title, description } = getMetaTags(Astro.props.title);
+
+const shouldContainFilters = () => {
+  const isProfilePage = Astro.url.pathname.startsWith("/@");
+  const isSearchPage = Astro.url.pathname.startsWith("/search");
+  return !isProfilePage && !isSearchPage;
+};
 ---
 
 <!DOCTYPE html>
@@ -23,18 +29,15 @@ const { title, description } = getMetaTags(Astro.props.title);
     <meta name="og:description" content={description} />
   </head>
   <body>
-    <body class="min-w-fold bg-neutral-900 text-white">
+    <body class="min-w-fold bg-black text-white">
       <Navigation />
-      <main
-        class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-neutral-500/40 p-3 md:border-x"
-      >
-        <!-- Show filters on all pages using this layout other than profiles -->
-        {
-          !Astro.url.pathname.startsWith("/@") && !Astro.url.pathname.startsWith("/search") && (
-            <Filters />
-          )
-        }
-        <slot />
+      <main class="bg-neutral-900">
+        <div
+          class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-neutral-500/40 p-3 md:border-x"
+        >
+          {shouldContainFilters() && <Filters />}
+          <slot />
+        </div>
       </main>
       <Footer />
     </body>

@@ -10,15 +10,15 @@ const page = getPage(Astro);
 const filter = Astro.url.searchParams.get("filter");
 
 const data: undefined | number[] = await req.json();
-if (!data) return Astro.redirect("/404");
+if (!data) throw Astro.redirect("/404");
 
 const posts = await getPosts(data, filter, page);
 
-if (posts.length == 0) return Astro.redirect("/404");
+if (posts.length === 0) throw Astro.redirect("/404");
 const isLastPage = posts.length < 20;
 ---
 
 <Layout title="Ask">
   {posts.map((post) => <ItemPreview data={post} />)}
-  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
+  {!isLastPage && <Pagination />}
 </Layout>

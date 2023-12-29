@@ -23,9 +23,9 @@ const { title, description } = getMetaTags(Astro.props.title, Astro.props.descri
     <meta name="og:description" content={description} />
   </head>
   <body>
-    <body class="min-w-fold bg-neutral-900 text-white">
+    <body class="min-w-fold bg-black text-white">
       <Navigation />
-      <div class="px-3">
+      <div class="bg-neutral-900 px-3">
         <slot />
       </div>
       <Footer />
