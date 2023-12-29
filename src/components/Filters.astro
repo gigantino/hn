@@ -33,15 +33,15 @@ const getUrl = (filter: string | null) => {
 
 <div class="flex justify-center gap-3 text-sm sm:justify-start sm:text-base">
   {
-    categories.map((c) => (
+    categories.map((category) => (
       <a
-        href={getUrl(c.filter)}
+        href={getUrl(category.filter)}
         class={`${
-          currentFilter === c.filter && "font-bold"
+          currentFilter === category.filter && "font-bold"
         } flex items-center justify-center gap-1`}
       >
-        <Icon name={c.icon} class="h-5 w-5" />
-        <span>{c.label}</span>
+        <Icon name={category.icon} class="h-5 w-5" />
+        <span>{category.label}</span>
       </a>
     ))
   }

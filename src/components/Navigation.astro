@@ -1,49 +1,45 @@
 ---
+import url from "url";
 import { Icon } from "astro-icon/components";
-const filter = Astro.url.searchParams.get("filter");
-const isSearch = Astro.url.pathname.startsWith("/search");
 
-type NavLink = {
-  label: string;
-  url: string;
-};
+const currentFilter = Astro.url.searchParams.get("filter");
 
-const links: NavLink[] = [
+const links = [
   {
     label: "news",
-    url: "",
+    path: "/",
   },
   {
     label: "ask",
-    url: "/ask",
+    path: "/ask",
   },
   {
     label: "show",
-    url: "/show",
+    path: "/show",
   },
 ];
 
-const isSelected = (url: string) => {
-  return Astro.url.pathname == url || Astro.url.pathname == `${url}/`;
+const isSelected = (path: string) => {
+  return Astro.url.pathname === path;
+};
+
+const getUrl = (path: string) => {
+  const parsedUrl = url.parse(path, true);
+  if (currentFilter) parsedUrl.query["filter"] = currentFilter;
+  return url.format(parsedUrl);
 };
 ---
 
 <nav class="h-14 w-full border-b border-neutral-500/40 bg-black px-3">
   <main class="m-auto flex h-full w-full max-w-screen-md items-center justify-between">
     <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
-    <div
-      class={!isSearch
-        ? "box-border flex items-center gap-3"
-        : "hidden md:box-border md:items-center md:gap-3 md:flex"}
-    >
+    <div class="box-border flex items-center gap-3">
       {
-        links.map((link) =>
-          isSelected(link.url) ? (
-            <a class="font-bold hover:cursor-default hover:no-underline">{link.label}</a>
-          ) : (
-            <a href={`${link.url}${filter ? `/?filter=${filter}` : ""}`}>{link.label}</a>
-          )
-        )
+        links.map((link) => (
+          <a href={getUrl(link.path)} class={isSelected(link.path) ? "font-bold" : ""}>
+            {link.label}
+          </a>
+        ))
       }
       <label
         for="q"
