@@ -29,11 +29,12 @@ const posts = await Promise.all(
   data
     .splice(20 * (page - 1), 20)
     .map((id) =>
-      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-    )
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
+    ),
 );
 
-if (posts.length == 0) return Astro.redirect("/404");
+if (posts.length === 0) return Astro.redirect("/404");
+
 const isLastPage = posts.length < 20;
 ---
 
@@ -41,5 +42,5 @@ const isLastPage = posts.length < 20;
   <div class="flex flex-col gap-3">
     {posts.map((post) => post.type == "story" && <ItemPreview data={post} />)}
   </div>
-  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
+  {!isLastPage && <Pagination />}
 </Layout>

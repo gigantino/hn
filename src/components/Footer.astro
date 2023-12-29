@@ -1,13 +1,14 @@
 ---
 import Search from "@components/Search.astro";
+import { version } from "@/package.json";
 ---
 
 <footer class="border-t border-neutral-500/40 bg-black p-3">
   <div class="m-auto flex w-full max-w-screen-md flex-col gap-3">
     <Search />
-    <div class="flex w-full justify-between">
-      <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
-      <div class="flex flex-row items-center justify-between gap-3 text-sm">
+    <div class="flex w-full justify-between text-sm">
+      <span>HN v{version}</span>
+      <div class="flex flex-row items-center justify-between gap-3">
         <a class="text-blue-500 hover:underline" href="https://github.com/gigantino/hn">GitHub</a>
         <a class="text-blue-500 hover:underline" href="https://news.ycombinator.com">HackerNews</a>
       </div>

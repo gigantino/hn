@@ -1,22 +1,15 @@
 ---
-export interface Props {
-  isLastPage: boolean;
-  page: number;
-  filter: string | null;
-}
-const { isLastPage, page, filter } = Astro.props;
+import url from "url";
+const currentPage = Astro.url.searchParams.get("page");
+const currentFilter = Astro.url.searchParams.get("filter");
 
-// Create the URL without losing the current filters
-let url = `${Astro.url.pathname}/?page=${page + 1}`.replace("//", "/");
-if (filter) url += `&filter=${filter}`;
+const parsedUrl = url.parse(Astro.url.pathname, true);
+parsedUrl.query["page"] = currentPage ? String(Number(currentPage) + 1) : "2";
+if (currentFilter) parsedUrl.query["filter"] = currentFilter;
+
+const nextPageUrl = url.format(parsedUrl);
 ---
 
-{
-  !isLastPage && (
-    <div class="flex w-full justify-center gap-3">
-      <a href={url} class="w-full text-center">
-        View more
-      </a>
-    </div>
-  )
-}
+<div class="flex w-full items-center justify-center">
+  <a href={nextPageUrl}>View more</a>
+</div>
