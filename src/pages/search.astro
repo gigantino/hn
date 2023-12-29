@@ -1,10 +1,13 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
-import makeSearch from "@modules/makeSearch";
+import algoliaSearch from "@modules/algoliaSearch";
 
 const query = Astro.url.searchParams.get("q");
-const posts = await makeSearch(query);
+if (!query) return Astro.redirect("/");
+
+const posts = await algoliaSearch(query);
+if (!posts) return Astro.redirect("/404");
 ---
 
 <Layout title={`${query} on HackerNews`}>
