@@ -2,6 +2,7 @@
 import xss from "xss";
 import Layout from "@layouts/Layout.astro";
 import getRelativeTime from "@modules/getRelativeTime";
+import { Icon } from "astro-icon/components";
 
 const { user } = Astro.params;
 
@@ -13,39 +14,32 @@ const { id: username, created: createdAt, karma, about, submitted: posts } = dat
 ---
 
 <Layout title={`@${username}`}>
-  <span>
-    <b>Username:</b>
-    <span>{username}</span>
-  </span>
+  <div class="h-auto w-full">
+    <div class="mx-auto max-w-md">
+      <h1 class="text-center text-2xl font-medium">@{username}</h1>
+      <p class="text-center text-neutral-400/75">
+        {new Date(createdAt * 1000).toLocaleDateString("it-IT")} ({getRelativeTime(createdAt)})
+      </p>
 
-  {
-    about && (
-      <span>
-        <b>About:</b>
-        <div set:html={xss(about)} />
-      </span>
-    )
-  }
+      <div class="mb-2 flex justify-center space-x-4">
+        <div class="flex items-center space-x-1">
+          <Icon name="star" />
+          <span>{karma}</span>
+        </div>
 
-  <span>
-    <b>Joined HN:</b>
-    <span>{getRelativeTime(createdAt)}</span>
-  </span>
+        <div class="flex items-center space-x-1">
+          <Icon name="comment" />
+          <span>{posts.length}</span>
+        </div>
+      </div>
 
-  <span>
-    <b>Karma:</b>
-    <span>{karma}</span>
-  </span>
+      {
+        about && (
+          <div class="text-left">
+            <p set:html={xss(about)} />
+          </div>
+        )
+      }
+    </div>
+  </div>
 </Layout>
-
-<style is:global>
-  p {
-    padding-top: 1vh;
-    padding-bottom: 1vh;
-  }
-  code {
-    display: block;
-    margin: 0 0 1em;
-    white-space: pre-wrap;
-  }
-</style>

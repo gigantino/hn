@@ -1,0 +1,72 @@
+---
+import xss from "xss";
+import Layout from "@layouts/Layout.astro";
+import getRelativeTime from "@modules/getRelativeTime";
+import HTMLParser from "node-html-parser";
+import { Icon } from "astro-icon/components";
+
+const auth = Astro.cookies.get("auth_user");
+if (!auth) return Astro.redirect("/login");
+
+const isLoggedIn = await fetch(`https://news.ycombinator.com/user?id=${auth.value.split("&")[0]}`, {
+  headers: {
+    "User-Agent": "HN by gigantino.dev",
+    Cookie: `user=${auth.value}`,
+  },
+})
+  .then((a) => a.text())
+  .then(
+    // check if in the submitted form from hn the "email:" tag exists! (no other ideas to check if the auth_token is valid)
+    (a) =>
+      HTMLParser.parse(a).querySelectorAll('td[valign="top"]')[4]?.firstChild?.text == "email:",
+  );
+
+if (!isLoggedIn) return Astro.redirect("/login");
+
+const req = await fetch(`${import.meta.env.HN_API}/user/${auth.value.split("&")[0]}.json`); // get the public user data
+const data = await req.json();
+
+const { id: username, created: createdAt, karma, about, submitted: posts } = data;
+---
+
+<Layout title={`@${username}`}>
+  <div class="h-auto w-full">
+    <div class="mx-auto max-w-md">
+      <h1 class="text-center text-2xl font-medium">@{username}</h1>
+      <p class="text-center text-neutral-400/75">
+        {new Date(createdAt * 1000).toLocaleDateString("it-IT")} ({getRelativeTime(createdAt)})
+      </p>
+
+      <div class="mb-2 flex justify-center space-x-4">
+        <div class="flex items-center space-x-1">
+          <Icon name="star" />
+          <span>{karma}</span>
+        </div>
+
+        <div class="flex items-center space-x-1">
+          <Icon name="comment" />
+          <span>{posts.length}</span>
+        </div>
+      </div>
+
+      <div class="text-left">
+        {about && <p set:html={xss(about)} />}
+      </div>
+
+      <div class="my-2 mt-4 w-full rounded-md border border-red-400/100 bg-red-400/50 p-2">
+        <h3 class="text-xl font-bold">Danger Zone</h3>
+        <p>
+          You won't logout from <a href="https://news.ycombinator.com" class="text-white underline"
+            >news.ycombinator.com</a
+          >
+        </p>
+        <a href="/logout" class="my-2">
+          <button
+            class="my-1 w-full rounded bg-red-500 p-1 text-center text-lg font-medium text-white hover:bg-red-500/50"
+            >Logout</button
+          >
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

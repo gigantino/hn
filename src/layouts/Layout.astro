@@ -9,11 +9,14 @@ export interface Props {
 }
 
 const { title, description } = getMetaTags(Astro.props.title);
+const blacklist = ["@", "search", "login", "me"];
 
-const shouldContainFilters = () => {
-  const isProfilePage = Astro.url.pathname.startsWith("/@");
-  const isSearchPage = Astro.url.pathname.startsWith("/search");
-  return !isProfilePage && !isSearchPage;
+const shouldContainFilters = (): boolean => {
+  for (const e of blacklist) {
+    if (Astro.url.pathname.startsWith(`/${e}`)) return false;
+  }
+
+  return true;
 };
 ---
 
@@ -43,3 +46,13 @@ const shouldContainFilters = () => {
     </body>
   </body>
 </html>
+
+<style is:global>
+  ::-webkit-scrollbar {
+    @apply w-2 bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-500/40;
+  }
+</style>

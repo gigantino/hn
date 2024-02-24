@@ -1,0 +1,55 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+const state = Astro.url.searchParams.get("state");
+---
+
+<Layout title="Login">
+  <h1 class="text-center text-2xl font-bold">Login with HN</h1>
+
+  <div class="h-auto w-full">
+    <div class="mx-auto max-w-xs">
+      {
+        state && Number(state) == 1 && (
+          <div class="my-2 h-auto w-full rounded border border-red-500/30 bg-red-400/75">
+            <div class="px-2 py-1 text-center underline">Invalid username or password.</div>
+          </div>
+        )
+      }
+
+      <form class="w-full" method="POST" action="/api/callback">
+        <div class="mb-2">
+          <label class="block font-medium" for="username">Username</label>
+          <input
+            class="w-full rounded border border-neutral-500/70 bg-neutral-700 px-2 py-1 text-white placeholder-neutral-400 ring-stone-50/10 focus:outline-none focus:ring"
+            type="text"
+            name="username"
+            placeholder="hack3r"
+            autocomplete="username"
+            required
+          />
+        </div>
+
+        <div class="mb-2">
+          <label class="block font-medium" for="password">Password</label>
+          <input
+            class="w-full rounded border border-neutral-500/70 bg-neutral-700 px-2 py-1 text-white placeholder-neutral-400 ring-stone-50/10 focus:outline-none focus:ring"
+            type="password"
+            name="password"
+            placeholder="***************"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <span class="mb-1 block text-sm text-neutral-400"
+          >Don't trust us? HN is <a href="https://github.com/gigantino/hn">opensource</a></span
+        >
+        <div class="inline-block">
+          <button type="submit" class="rounded bg-blue-700 px-2 py-1 hover:bg-blue-700/70"
+            >Login</button
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+</Layout>
