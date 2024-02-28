@@ -1,4 +1,5 @@
 ---
+Astro.response.headers.set("Cache-Control", "max-age=0, private");
 import Layout from "@layouts/Layout.astro";
 
 const state = Astro.url.searchParams.get("state");
