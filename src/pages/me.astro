@@ -1,6 +1,5 @@
 ---
 Astro.response.headers.set("Cache-Control", "max-age=0, private");
-
 import xss from "xss";
 import Layout from "@layouts/Layout.astro";
 import getRelativeTime from "@modules/getRelativeTime";
@@ -8,7 +7,15 @@ import HTMLParser from "node-html-parser";
 import { Icon } from "astro-icon/components";
 
 const auth = Astro.cookies.get("auth_user");
-if (!auth) return Astro.redirect("/login");
+if (!auth)
+  return new Response(null, {
+    // Astro.redirect does not send cache-control header
+    status: 302,
+    headers: {
+      Location: "/login",
+      "Cache-Control": "max-age=0, private",
+    },
+  });
 
 const isLoggedIn = await fetch(`https://news.ycombinator.com/user?id=${auth.value.split("&")[0]}`, {
   headers: {
@@ -23,7 +30,14 @@ const isLoggedIn = await fetch(`https://news.ycombinator.com/user?id=${auth.valu
       HTMLParser.parse(a).querySelectorAll('td[valign="top"]')[4]?.firstChild?.text == "email:",
   );
 
-if (!isLoggedIn) return Astro.redirect("/login");
+if (!isLoggedIn)
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: "/login",
+      "Cache-Control": "max-age=0, private",
+    },
+  });
 
 const req = await fetch(`${import.meta.env.HN_API}/user/${auth.value.split("&")[0]}.json`); // get the public user data
 const data = await req.json();

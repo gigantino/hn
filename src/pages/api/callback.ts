@@ -53,7 +53,6 @@ export const POST: APIRoute = async ({ cookies, request }) => {
     status: 302,
     headers: {
       Location: "/me",
-      'Cache-Control': 'max-age=0, private'
     },
   });
 };
