@@ -133,8 +133,14 @@ const validComments = comments.filter((c): c is HNComment => c !== null);
 
       {validComments.length > 0 ? (
         <div class="space-y-4">
-          {validComments.map((comment) => (
-            <Comment data={comment} isLight={true} storyPage={currentPage} />
+          {validComments.map((comment, index) => (
+            <Comment
+              data={comment}
+              isLight={true}
+              storyPage={currentPage}
+              prevId={validComments[index - 1]?.id}
+              nextId={validComments[index + 1]?.id}
+            />
           ))}
         </div>
       ) : (

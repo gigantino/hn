@@ -12,9 +12,11 @@ interface Props {
   isLight?: boolean;
   hideThreadLink?: boolean;
   storyPage?: number;
+  prevId?: number;
+  nextId?: number;
 }
 
-const { data, depth = 0, maxDepth = 5, maxRepliesPerLevel = 3, isLight = true, hideThreadLink = false, storyPage = 1 } = Astro.props;
+const { data, depth = 0, maxDepth = 5, maxRepliesPerLevel = 3, isLight = true, hideThreadLink = false, storyPage = 1, prevId, nextId } = Astro.props;
 
 const replies = data.kids ?? [];
 const visibleReplies = replies.slice(0, maxRepliesPerLevel);
@@ -50,15 +52,7 @@ const bgColor = isLight
         {data.by}
       </a>
       <span>·</span>
-      <span>{getRelativeTime(data.time)}</span>
-      {!hideThreadLink && totalReplies > 0 && (
-        <>
-          <span>·</span>
-          <a href={`/item/${data.id}?fromPage=${storyPage}&fromComment=${data.id}`} class="text-blue-600 hover:underline dark:text-blue-400">
-            view thread
-          </a>
-        </>
-      )}
+      <span>{getRelativeTime(data.time, true)}</span>
     </div>
 
     <!-- Comment body -->
@@ -67,10 +61,34 @@ const bgColor = isLight
       set:html={cleanText(xss(data.text || ""))}
     />
 
+    <!-- Comment actions -->
+    {(prevId || nextId || (!hideThreadLink && totalReplies > 0)) && (
+      <div class="flex items-center gap-2 mt-2 text-xs">
+        {prevId && (
+          <a href={`#c-${prevId}`} class="text-blue-600 hover:underline dark:text-blue-400">
+            ↑ prev
+          </a>
+        )}
+        {nextId && (
+          <a href={`#c-${nextId}`} class="text-blue-600 hover:underline dark:text-blue-400">
+            ↓ next
+          </a>
+        )}
+        {!hideThreadLink && totalReplies > 0 && (
+          <a
+            href={`/item/${data.id}?fromPage=${storyPage}&fromComment=${data.id}`}
+            class="text-blue-600 hover:underline dark:text-blue-400"
+          >
+            view
+          </a>
+        )}
+      </div>
+    )}
+
     <!-- Nested replies -->
     {depth < maxDepth && visibleReplies.length > 0 && (
       <div class="mt-2">
-        {visibleReplies.map((reply) => (
+        {visibleReplies.map((reply, index) => (
           <Astro.self
             data={reply}
             depth={depth + 1}
@@ -79,6 +97,8 @@ const bgColor = isLight
             isLight={!isLight}
             hideThreadLink={hideThreadLink}
             storyPage={storyPage}
+            prevId={visibleReplies[index - 1]?.id}
+            nextId={visibleReplies[index + 1]?.id}
           />
         ))}
       </div>
