@@ -1,20 +1,20 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   theme: {
     extend: {
       screens: {
-        "xs": "480px",
+        xs: "480px",
       },
       minWidth: {
-        "fold": "280px", // Galaxy Fold
+        fold: "280px",
       },
     },
   },
   plugins: [
     ({ addBase, theme }) => {
       addBase({
-        "a": {
+        a: {
           color: theme("colors.blue.500"),
           cursor: "pointer",
         },

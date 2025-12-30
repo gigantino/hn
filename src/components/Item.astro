@@ -3,9 +3,10 @@ import xss from "xss";
 
 import getRelativeTime from "@modules/getRelativeTime";
 import Item from "@components/Item.astro";
+import type { HNComment } from "@/types/hn";
 
-export interface Props {
-  data: any;
+interface Props {
+  data: HNComment;
 }
 const { data } = Astro.props;
 ---
@@ -40,13 +41,13 @@ const { data } = Astro.props;
       Astro.url.pathname == `/item/${data.id}` ? (
         <div class="flex gap-1 text-sm">
           <img src="/icons/comment.svg" alt="comment" />
-          <span>{data.kids.length | 0}</span>
+          <span>{data.kids?.length ?? 0}</span>
         </div>
       ) : (
         <div class="flex gap-1 text-sm">
-          {data.kids.length > 0 && (
+          {(data.kids?.length ?? 0) > 0 && (
             <a href={`/item/${data.id}`} class="text-blue-500 hover:underline">
-              {`${data.kids.length} ${data.kids.length == 1 ? "reply" : "replies"}`}
+              {`${data.kids!.length} ${data.kids!.length === 1 ? "reply" : "replies"}`}
             </a>
           )}
         </div>
@@ -54,7 +55,7 @@ const { data } = Astro.props;
     }
     <!-- Nested comments (recursive) -->
     <div>
-      {data.kids && data.kids.map((kid: any) => <Item data={kid} />)}
+      {data.kids?.map((kid) => <Item data={kid} />)}
     </div>
   </div>
 </div>

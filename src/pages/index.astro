@@ -29,8 +29,8 @@ const posts = await Promise.all(
   data
     .splice(20 * (page - 1), 20)
     .map((id) =>
-      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json())
-    )
+      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
+    ),
 );
 
 if (posts.length == 0) return Astro.redirect("/404");

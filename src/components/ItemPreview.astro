@@ -1,9 +1,10 @@
 ---
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
+import type { HNItem } from "@/types/hn";
 
-export interface Props {
-  data: any;
+interface Props {
+  data: HNItem;
 }
 const { data } = Astro.props;
 ---
@@ -42,7 +43,7 @@ const { data } = Astro.props;
       <div class="flex gap-1">
         <img src="/icons/comment.svg" alt="comment" />
         <a class="cursor-pointer text-blue-500 hover:underline" href={`/item/${data.id}`}>
-          {`${data.descendants | 0} ${data.descendants == 1 ? "comment" : "comments"}`}
+          {`${data.descendants ?? 0} ${data.descendants === 1 ? "comment" : "comments"}`}
         </a>
       </div>
     </div>

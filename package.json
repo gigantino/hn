@@ -11,16 +11,16 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/tailwind": "^3.1.3",
-		"@astrojs/vercel": "^3.8.2",
-		"astro": "^2.10.12",
-		"tailwindcss": "^3.3.3",
-		"xss": "^1.0.14"
+		"@astrojs/tailwind": "^6.0.2",
+		"@astrojs/vercel": "^9.0.2",
+		"astro": "^5.16.6",
+		"tailwindcss": "^3.4.17",
+		"xss": "^1.0.15"
 	},
 	"devDependencies": {
-		"prettier": "^2.8.8",
-		"prettier-plugin-astro": "^0.8.1",
-		"prettier-plugin-organize-imports": "^3.2.3",
-		"prettier-plugin-tailwindcss": "^0.2.8"
+		"prettier": "^3.7.4",
+		"prettier-plugin-astro": "^0.14.1",
+		"prettier-plugin-organize-imports": "^4.3.0",
+		"prettier-plugin-tailwindcss": "^0.7.2"
 	}
 }

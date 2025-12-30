@@ -2,17 +2,9 @@
 import ItemLayout from "@layouts/ItemLayout.astro";
 import Item from "@components/Item.astro";
 import Story from "@components/Story.astro";
+import type { HNComment } from "@/types/hn";
 
 const { id } = Astro.params;
-
-interface Comment {
-  id: number;
-  text: string;
-  by: string;
-  time: number;
-  score: number;
-  kids?: Comment[];
-}
 
 const getPostComments = async (postId: number) => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${postId}.json`);
@@ -21,16 +13,16 @@ const getPostComments = async (postId: number) => {
   // Return directly, it will redirect if the data is undefined.
   if (!post) return;
 
-  const commentIds = post.kids || [];
-  const comments = await Promise.all(commentIds.map((id: any) => getComment(id)));
+  const commentIds: number[] = post.kids || [];
+  const comments = await Promise.all(commentIds.map((id) => getComment(id)));
 
-  const kids = comments.filter((comment) => comment) as Comment[];
+  const kids = comments.filter((comment): comment is HNComment => comment !== null);
   post.kids = kids;
 
   return post;
 };
 
-const getComment = async (commentId: number) => {
+const getComment = async (commentId: number): Promise<HNComment | null> => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${commentId}.json`);
   const comment = await response.json();
 
@@ -38,8 +30,8 @@ const getComment = async (commentId: number) => {
     return null;
   }
 
-  const nestedCommentIds = comment.kids || [];
-  const nestedComments = await Promise.all(nestedCommentIds.map((id: any) => getComment(id)));
+  const nestedCommentIds: number[] = comment.kids || [];
+  const nestedComments = await Promise.all(nestedCommentIds.map((id) => getComment(id)));
 
   return {
     id: comment.id,
@@ -47,7 +39,7 @@ const getComment = async (commentId: number) => {
     by: comment.by,
     time: comment.time,
     score: comment.score,
-    kids: nestedComments.filter((comment) => comment) as Comment[],
+    kids: nestedComments.filter((comment): comment is HNComment => comment !== null),
   };
 };
 

@@ -42,10 +42,13 @@ const isSelected = (url: string) => {
             <a class="font-bold hover:cursor-default hover:no-underline">{link.label}</a>
           ) : (
             <a href={`${link.url}${filter ? `/?filter=${filter}` : ""}`}>{link.label}</a>
-          )
+          ),
         )
       }
-      <label for="q" class="block rounded-md border border-neutral-500/40 p-2 text-white cursor-pointer">
+      <label
+        for="q"
+        class="block cursor-pointer rounded-md border border-neutral-500/40 p-2 text-white"
+      >
         <img src="/icons/search.svg" alt="search" />
       </label>
     </div>

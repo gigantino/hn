@@ -4,9 +4,10 @@ import xss from "xss";
 import Item from "@components/Item.astro";
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
+import type { HNItem, HNComment } from "@/types/hn";
 
-export interface Props {
-  data: any;
+interface Props {
+  data: HNItem & { kids?: HNComment[] };
 }
 const { data } = Astro.props;
 ---
@@ -46,23 +47,19 @@ const { data } = Astro.props;
       }
     </div>
     <!-- Upvotes and comments -->
-    <div class="flex flex-wrap items-center gap-3 text-sm py-3">
+    <div class="flex flex-wrap items-center gap-3 py-3 text-sm">
       <div class="flex gap-1">
         <img src="/icons/upvote.svg" alt="upvote" />
-        <span>
-          {data.score | 0}
-        </span>
+        <span>{data.score ?? 0}</span>
       </div>
       <div class="flex gap-1">
         <img src="/icons/comment.svg" alt="comment" />
-        <span>
-          {data.descendants | 0}
-        </span>
+        <span>{data.descendants ?? 0}</span>
       </div>
     </div>
     <!-- Nested comments (recursive) -->
     <div>
-      {data.kids && data.kids.map((kid: any) => <Item data={kid} />)}
+      {data.kids?.map((kid) => <Item data={kid} />)}
     </div>
   </div>
 </div>

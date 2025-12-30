@@ -42,24 +42,24 @@ const isSelected = (category: Category) => {
 };
 ---
 
-<div class="flex gap-3 justify-center text-sm sm:justify-start sm:text-base">
+<div class="flex justify-center gap-3 text-sm sm:justify-start sm:text-base">
   {
     categories.map((category) =>
       isSelected(category) ? (
-        <a class="hover:no-underline hover:cursor-default">
-          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
+        <a class="hover:cursor-default hover:no-underline">
+          <div class="flex flex-wrap justify-center gap-1 sm:justify-start">
             <img src={category.icon} alt="upvote" />
             <span class="font-bold">{category.label}</span>
           </div>
         </a>
       ) : (
         <a href={linkFromCategory(category)}>
-          <div class="flex gap-1 flex-wrap justify-center sm:justify-start">
+          <div class="flex flex-wrap justify-center gap-1 sm:justify-start">
             <img src={category.icon} alt="upvote" />
             <span>{category.label}</span>
           </div>
         </a>
-      )
+      ),
     )
   }
 </div>
