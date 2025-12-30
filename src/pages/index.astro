@@ -5,6 +5,14 @@ import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
 
 const page = getPage(Astro);
+
+// Get bookmarked IDs from cookie
+const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
+const bookmarkedIds = new Set(
+  bookmarkCookie
+    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
+    : []
+);
 const filter = Astro.url.searchParams.get("filter");
 
 let requestUrl = import.meta.env.HN_API;
@@ -25,21 +33,35 @@ const req = await fetch(requestUrl);
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
+const itemsPerPage = 20;
+const totalPages = Math.ceil(data.length / itemsPerPage);
+
+// Redirect to last valid page if out of bounds
+if (page > totalPages && totalPages > 0) {
+  const params = new URLSearchParams();
+  params.set("page", String(totalPages));
+  if (filter) params.set("filter", filter);
+  return Astro.redirect(`/?${params.toString()}`);
+}
+
+const startIndex = (page - 1) * itemsPerPage;
+const pageIds = data.slice(startIndex, startIndex + itemsPerPage);
+
 const posts = await Promise.all(
-  data
-    .splice(20 * (page - 1), 20)
-    .map((id) =>
-      fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
-    ),
+  pageIds.map((id) =>
+    fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
+  ),
 );
 
-if (posts.length == 0) return Astro.redirect("/404");
-const isLastPage = posts.length < 20;
+if (posts.length == 0 && page === 1) return Astro.redirect("/404");
+
+const baseUrl = filter ? `/?filter=${filter}` : "/";
 ---
 
 <Layout title="News">
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
-    {posts.map((post) => post.type == "story" && <ItemPreview data={post} />)}
+    {posts.map((post) => post.type == "story" && <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}
   </div>
-  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
 </Layout>

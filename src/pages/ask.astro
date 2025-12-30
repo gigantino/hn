@@ -3,22 +3,51 @@ import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
-import getPosts from "@modules/getPosts";
 
 const req = await fetch(`${import.meta.env.HN_API}/askstories.json`);
 const page = getPage(Astro);
 const filter = Astro.url.searchParams.get("filter");
 
+// Get bookmarked IDs from cookie
+const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
+const bookmarkedIds = new Set(
+  bookmarkCookie
+    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
+    : []
+);
+
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
 
-const posts = await getPosts(data, filter, page);
+const itemsPerPage = 20;
+const totalPages = Math.ceil(data.length / itemsPerPage);
 
-if (posts.length == 0) return Astro.redirect("/404");
-const isLastPage = posts.length < 20;
+// Redirect to last valid page if out of bounds
+if (page > totalPages && totalPages > 0) {
+  const params = new URLSearchParams();
+  params.set("page", String(totalPages));
+  if (filter) params.set("filter", filter);
+  return Astro.redirect(`/ask?${params.toString()}`);
+}
+
+const startIndex = (page - 1) * itemsPerPage;
+const pageIds = data.slice(startIndex, startIndex + itemsPerPage);
+
+const posts = await Promise.all(
+  pageIds.map((id) =>
+    fetch(`${import.meta.env.HN_API}/item/${id}.json`).then(async (resp) => await resp.json()),
+  ),
+);
+
+if (posts.length == 0 && page === 1) return Astro.redirect("/404");
+
+const baseUrl = filter ? `/ask?filter=${filter}` : "/ask";
 ---
 
 <Layout title="Ask">
-  {posts.map((post) => <ItemPreview data={post} />)}
-  <Pagination isLastPage={isLastPage} page={page} filter={filter} />
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
+  <div class="flex flex-col gap-3">
+    {posts.map((post) => <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}
+  </div>
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
 </Layout>

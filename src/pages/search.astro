@@ -5,6 +5,14 @@ import makeSearch from "@modules/makeSearch";
 
 const query = Astro.url.searchParams.get("q");
 const posts = await makeSearch(query);
+
+// Get bookmarked IDs from cookie
+const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
+const bookmarkedIds = new Set(
+  bookmarkCookie
+    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
+    : []
+);
 ---
 
 <Layout title={`${query} on HackerNews`}>
@@ -12,7 +20,7 @@ const posts = await makeSearch(query);
     posts.map((post) => {
       if (!post.title) return;
 
-      return <ItemPreview data={post} />;
+      return <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />;
     })
   }
 </Layout>

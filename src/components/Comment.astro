@@ -63,7 +63,7 @@ const bgColor = isLight
 
     <!-- Comment body -->
     <div
-      class="mt-1 text-sm text-neutral-800 dark:text-neutral-200 [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_code]:font-mono [&_code]:bg-neutral-200 dark:[&_code]:bg-neutral-700 [&_code]:text-[0.8em] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-neutral-200 dark:[&_pre]:bg-neutral-700 [&_pre]:p-3 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_.quote]:border-l-2 [&_.quote]:border-neutral-300 dark:[&_.quote]:border-neutral-600 [&_.quote]:pl-3 [&_.quote]:text-neutral-600 dark:[&_.quote]:text-neutral-400 [&_.quote]:italic"
+      class="mt-1 text-sm text-neutral-800 dark:text-neutral-200 break-words [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_a]:break-all [&_code]:font-mono [&_code]:bg-neutral-200 dark:[&_code]:bg-neutral-700 [&_code]:text-[0.8em] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-neutral-200 dark:[&_pre]:bg-neutral-700 [&_pre]:p-3 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_.quote]:border-l-2 [&_.quote]:border-neutral-300 dark:[&_.quote]:border-neutral-600 [&_.quote]:pl-3 [&_.quote]:text-neutral-600 dark:[&_.quote]:text-neutral-400 [&_.quote]:italic"
       set:html={cleanText(xss(data.text || ""))}
     />
 

@@ -1,0 +1,118 @@
+---
+import Layout from "@layouts/Layout.astro";
+import ItemPreview from "@components/ItemPreview.astro";
+import Pagination from "@components/Pagination.astro";
+import type { HNItem } from "@/types/hn";
+
+// Parse bookmarks from cookie
+const cookieValue = Astro.cookies.get("bookmarks")?.value;
+const bookmarkIds = cookieValue
+  ? cookieValue
+      .split(",")
+      .map((id) => parseInt(id, 10))
+      .filter((id) => !isNaN(id))
+  : [];
+
+const bookmarkSet = new Set(bookmarkIds);
+
+// Pagination
+const itemsPerPage = 20;
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get("page") || "1"));
+const totalPages = Math.ceil(bookmarkIds.length / itemsPerPage);
+
+// Redirect to last valid page if out of bounds
+if (currentPage > totalPages && totalPages > 0) {
+  return Astro.redirect(`/bookmarks?page=${totalPages}`);
+}
+
+// Get bookmarks for current page
+const startIndex = (currentPage - 1) * itemsPerPage;
+const pageBookmarkIds = bookmarkIds.slice(startIndex, startIndex + itemsPerPage);
+
+// Fetch bookmark data from HN API
+const bookmarks: HNItem[] = [];
+for (const id of pageBookmarkIds) {
+  try {
+    const response = await fetch(`${import.meta.env.HN_API}/item/${id}.json`);
+    const item = await response.json();
+    if (item && !item.deleted && !item.dead) {
+      bookmarks.push(item);
+    }
+  } catch {
+    // Skip failed fetches
+  }
+}
+---
+
+<Layout title="Bookmarks">
+  <div class="flex flex-col gap-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold">Bookmarks</h1>
+      <span class="text-sm text-neutral-500 dark:text-neutral-400">
+        {bookmarkIds.length} {bookmarkIds.length === 1 ? "item" : "items"}
+      </span>
+    </div>
+
+    {bookmarks.length > 0 ? (
+      <div class="flex flex-col gap-3">
+        {bookmarks.map((item) => (
+          <ItemPreview data={item} bookmarkedIds={bookmarkSet} />
+        ))}
+      </div>
+    ) : bookmarkIds.length > 0 ? (
+      <p class="text-neutral-500 dark:text-neutral-400">
+        Loading bookmarks failed. The items may have been deleted.
+      </p>
+    ) : (
+      <p class="text-neutral-500 dark:text-neutral-400">
+        No bookmarks yet. Click the bookmark icon on any post to save it here.
+      </p>
+    )}
+
+    {totalPages > 1 && (
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/bookmarks" />
+    )}
+
+    <hr class="border-gray-200 dark:border-neutral-700" />
+
+    <section class="flex flex-col gap-4">
+      <h2 class="text-lg font-semibold">Export & Import</h2>
+
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+        <a
+          href="/api/bookmarks/export"
+          download="hn-bookmarks.json"
+          class="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          Export as JSON
+        </a>
+        <span class="text-neutral-300 dark:text-neutral-600">|</span>
+        <form
+          method="POST"
+          action="/api/bookmarks"
+          enctype="multipart/form-data"
+          class="flex items-center gap-2"
+        >
+          <input type="hidden" name="action" value="import" />
+          <input type="hidden" name="redirect" value="/bookmarks" />
+          <input type="file" name="file" accept=".json" required class="w-48 text-sm" />
+          <button type="submit" class="text-blue-600 hover:underline dark:text-blue-400">
+            Import
+          </button>
+        </form>
+        {bookmarkIds.length > 0 && (
+          <>
+            <span class="text-neutral-300 dark:text-neutral-600">|</span>
+            <form method="POST" action="/api/bookmarks" class="inline">
+              <input type="hidden" name="action" value="clear" />
+              <input type="hidden" name="redirect" value="/bookmarks" />
+              <button type="submit" class="text-red-600 hover:underline dark:text-red-400">
+                Clear all
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </section>
+  </div>
+</Layout>

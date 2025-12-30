@@ -5,14 +5,19 @@ import type { HNItem } from "@/types/hn";
 import UpvoteIcon from "@components/icons/Upvote.astro";
 import CommentIcon from "@components/icons/Comment.astro";
 import ExternalLinkIcon from "@components/icons/ExternalLink.astro";
+import BookmarkIcon from "@components/icons/Bookmark.astro";
 
 interface Props {
   data: HNItem;
+  bookmarkedIds?: Set<number>;
 }
-const { data } = Astro.props;
+const { data, bookmarkedIds } = Astro.props;
+
+const isBookmarked = bookmarkedIds?.has(data.id) ?? false;
+const currentUrl = Astro.url.pathname + Astro.url.search + `#item-${data.id}`;
 ---
 
-<div class="rounded-md border border-gray-300 bg-white dark:border-neutral-500/40 dark:bg-black">
+<div id={`item-${data.id}`} class="rounded-md border border-gray-300 bg-white dark:border-neutral-500/40 dark:bg-black">
   <div class="flex w-full flex-col gap-2 break-words p-3">
     <!-- Author, time and title -->
     <div class="flex flex-col gap-1">
@@ -37,7 +42,7 @@ const { data } = Astro.props;
       }
     </div>
     <hr class="border-gray-200 dark:border-neutral-500/40" />
-    <!-- Upvotes and comments -->
+    <!-- Upvotes, comments, and bookmark -->
     <div class="flex flex-wrap items-center gap-3 text-sm">
       <div class="flex gap-1">
         <UpvoteIcon />
@@ -45,10 +50,23 @@ const { data } = Astro.props;
       </div>
       <div class="flex gap-1">
         <CommentIcon />
-        <a class="cursor-pointer text-blue-500 hover:underline" href={`/item/${data.id}`}>
+        <a class="text-blue-600 hover:underline dark:text-blue-400" href={`/item/${data.id}`}>
           {`${data.descendants ?? 0} ${data.descendants === 1 ? "comment" : "comments"}`}
         </a>
       </div>
+      <form method="POST" action="/api/bookmarks" class="flex">
+        <input type="hidden" name="id" value={data.id} />
+        <input type="hidden" name="action" value={isBookmarked ? "remove" : "add"} />
+        <input type="hidden" name="redirect" value={currentUrl} />
+        <button
+          type="submit"
+          class="flex items-center gap-1"
+          title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+        >
+          <BookmarkIcon filled={isBookmarked} />
+          <span class="text-blue-600 hover:underline dark:text-blue-400">{isBookmarked ? "saved" : "save"}</span>
+        </button>
+      </form>
     </div>
   </div>
 </div>

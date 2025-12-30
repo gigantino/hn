@@ -30,15 +30,14 @@ const categories: Category[] = [
   },
 ];
 
-// Create the URL without losing the current page
+// Create URL for filter, preserving current page
 const linkFromCategory = (category: Category) => {
-  let url = Astro.url.pathname;
-  if (page) url += `/?page=${page}&`;
-  if (category.filter) url += `/?filter=${category.filter}`;
-  else if (filter) return url;
-  else url = url.slice(0, -1);
-
-  return url.replace("//", "/").replace("&/?", "&");
+  const path = Astro.url.pathname;
+  const params = new URLSearchParams();
+  if (page && page !== "1") params.set("page", page);
+  if (category.filter) params.set("filter", category.filter);
+  const query = params.toString();
+  return query ? `${path}?${query}` : path;
 };
 
 const isSelected = (category: Category) => {

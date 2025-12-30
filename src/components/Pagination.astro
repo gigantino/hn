@@ -8,17 +8,23 @@ interface Props {
 const { currentPage, totalPages, baseUrl } = Astro.props;
 const hasPrevPage = currentPage > 1;
 const hasNextPage = currentPage < totalPages;
+
+// Build URL with page parameter, handling existing query params
+const buildPageUrl = (page: number) => {
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  return `${baseUrl}${separator}page=${page}`;
+};
 ---
 
 {(hasPrevPage || hasNextPage) && (
   <div class="flex items-center justify-between text-sm">
     <span class="text-neutral-500 dark:text-neutral-400">
-      Page {currentPage} of {totalPages}
+      Page {currentPage} of <a href={buildPageUrl(totalPages)} class="text-blue-600 hover:underline dark:text-blue-400">{totalPages}</a>
     </span>
     <div class="flex gap-4">
       {hasPrevPage && (
         <a
-          href={`${baseUrl}?page=${currentPage - 1}`}
+          href={buildPageUrl(currentPage - 1)}
           class="text-blue-600 hover:underline dark:text-blue-400"
         >
           ← Previous
@@ -26,7 +32,7 @@ const hasNextPage = currentPage < totalPages;
       )}
       {hasNextPage && (
         <a
-          href={`${baseUrl}?page=${currentPage + 1}`}
+          href={buildPageUrl(currentPage + 1)}
           class="text-blue-600 hover:underline dark:text-blue-400"
         >
           Next →

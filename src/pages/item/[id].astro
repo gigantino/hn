@@ -55,6 +55,14 @@ const getComment = async (commentId: number, depth: number = 0): Promise<HNComme
 const post = await getPost(Number(id));
 if (!post) return Astro.redirect("/404");
 
+// Get bookmarked IDs from cookie
+const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
+const bookmarkedIds = new Set(
+  bookmarkCookie
+    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
+    : []
+);
+
 // If this is a comment, fetch parent chain for context
 let parentStory: HNItem | null = null;
 let topLevelCommentId: number | null = null;
@@ -101,7 +109,7 @@ const validComments = comments.filter((c): c is HNComment => c !== null);
 ---
 
 <ItemLayout title={post.title || `Item ${post.id}`} description={post.text}>
-  {post.type === "story" && <Story data={post} />}
+  {post.type === "story" && <Story data={post} bookmarkedIds={bookmarkedIds} />}
 
   {post.type === "comment" && (
     <div class="m-auto max-w-screen-md">
