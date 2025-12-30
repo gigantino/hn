@@ -78,7 +78,7 @@ export const GET: APIRoute = async ({ request }) => {
               display: "flex",
               flexDirection: "column",
               flex: 1,
-              justifyContent: "center",
+              justifyContent: "flex-end",
             },
             children: [
               // Title
