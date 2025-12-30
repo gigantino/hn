@@ -6,9 +6,21 @@ import getMetaTags from "@modules/getMetaTags";
 export interface Props {
   title: string;
   description?: string;
+  author?: string;
+  score?: number;
+  comments?: number;
 }
 
 const { title, description } = getMetaTags(Astro.props.title, Astro.props.description);
+const { author, score, comments } = Astro.props;
+
+// Build OG image URL with query params
+const ogImageParams = new URLSearchParams();
+ogImageParams.set("title", Astro.props.title);
+if (author) ogImageParams.set("author", author);
+if (score !== undefined) ogImageParams.set("score", String(score));
+if (comments !== undefined) ogImageParams.set("comments", String(comments));
+const ogImageUrl = new URL(`/api/og?${ogImageParams.toString()}`, Astro.url.origin).toString();
 
 // Get theme from cookie
 const theme = Astro.cookies.get("theme")?.value || "system";
@@ -25,8 +37,19 @@ const themeClass = theme === "system" ? "" : theme;
     <meta name="generator" content={Astro.generator} />
     <meta name="robots" content="noindex, nofollow" />
     <title>{title}</title>
-    <meta name="og:title" content={title} />
-    <meta name="og:description" content={description} />
+    <meta name="description" content={description} />
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
   </head>
   <body class="min-w-fold bg-gray-100 text-neutral-900 dark:bg-neutral-900 dark:text-white">
     <Navigation />

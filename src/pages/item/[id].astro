@@ -108,7 +108,7 @@ const comments = await Promise.all(commentIdsToFetch.map((cid) => getComment(cid
 const validComments = comments.filter((c): c is HNComment => c !== null);
 ---
 
-<ItemLayout title={post.title || `Item ${post.id}`} description={post.text}>
+<ItemLayout title={post.title || `Item ${post.id}`} description={post.text} author={post.by} score={post.score} comments={post.descendants}>
   {post.type === "story" && <Story data={post} bookmarkedIds={bookmarkedIds} />}
 
   {post.type === "comment" && (

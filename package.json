@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@astrojs/tailwind": "^6.0.2",
 		"@astrojs/vercel": "^9.0.2",
+		"@vercel/og": "^0.8.6",
 		"astro": "^5.16.6",
 		"tailwindcss": "^3.4.17",
 		"xss": "^1.0.15"
