@@ -127,6 +127,10 @@ const validComments = comments.filter((c): c is HNComment => c !== null);
 
   {post.type === "story" && (
     <div class="m-auto max-w-screen-md mt-6">
+      <div class="mb-6">
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/item/${id}`} />
+      </div>
+
       {validComments.length > 0 ? (
         <div class="space-y-4">
           {validComments.map((comment) => (
