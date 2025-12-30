@@ -9,72 +9,62 @@ const theme = Astro.cookies.get("theme")?.value || "system";
   <div class="flex flex-col gap-6">
     <h1 class="text-2xl font-bold">Settings</h1>
 
-    <section class="flex flex-col gap-3">
+    <section class="flex flex-col gap-4">
       <h2 class="text-lg font-semibold">Theme</h2>
-      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-        Choose how the site looks to you. Select "System" to automatically match your device's
-        settings.
+      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+        Choose how the site looks to you.
       </p>
 
-      <form method="POST" action="/api/theme" class="flex flex-col gap-3">
+      <form method="POST" action="/api/theme" class="flex flex-col gap-2">
         <input type="hidden" name="redirect" value="/settings" />
 
-        <label
-          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "system" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
-        >
-          <input
-            type="radio"
-            name="theme"
-            value="system"
-            checked={theme === "system"}
-            class="h-4 w-4 accent-blue-500"
-          />
-          <div class="flex flex-col">
-            <span class="font-medium">System</span>
-            <span class="text-sm text-neutral-600 dark:text-neutral-400">
-              Follow your device's theme
-            </span>
-          </div>
-        </label>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          <label class="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="radio"
+              name="theme"
+              value="system"
+              checked={theme === "system"}
+              class="accent-blue-500"
+            />
+            <span class={theme === "system" ? "text-blue-600 dark:text-blue-400" : ""}>system</span>
+          </label>
 
-        <label
-          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "light" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
-        >
-          <input
-            type="radio"
-            name="theme"
-            value="light"
-            checked={theme === "light"}
-            class="h-4 w-4 accent-blue-500"
-          />
-          <div class="flex flex-col">
-            <span class="font-medium">Light</span>
-            <span class="text-sm text-neutral-600 dark:text-neutral-400">Always use light mode</span>
-          </div>
-        </label>
+          <span class="text-neutral-300 dark:text-neutral-600">|</span>
 
-        <label
-          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "dark" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
-        >
-          <input
-            type="radio"
-            name="theme"
-            value="dark"
-            checked={theme === "dark"}
-            class="h-4 w-4 accent-blue-500"
-          />
-          <div class="flex flex-col">
-            <span class="font-medium">Dark</span>
-            <span class="text-sm text-neutral-600 dark:text-neutral-400">Always use dark mode</span>
-          </div>
-        </label>
+          <label class="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="radio"
+              name="theme"
+              value="light"
+              checked={theme === "light"}
+              class="accent-blue-500"
+            />
+            <span class={theme === "light" ? "text-blue-600 dark:text-blue-400" : ""}>light</span>
+          </label>
 
-        <button
-          type="submit"
-          class="mt-2 w-fit rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-        >
-          Save
-        </button>
+          <span class="text-neutral-300 dark:text-neutral-600">|</span>
+
+          <label class="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="radio"
+              name="theme"
+              value="dark"
+              checked={theme === "dark"}
+              class="accent-blue-500"
+            />
+            <span class={theme === "dark" ? "text-blue-600 dark:text-blue-400" : ""}>dark</span>
+          </label>
+
+          <span class="text-neutral-300 dark:text-neutral-600">|</span>
+
+          <button
+            type="submit"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+          >
+            save
+          </button>
+        </div>
       </form>
     </section>
   </div>

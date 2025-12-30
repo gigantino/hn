@@ -9,6 +9,9 @@ export default function cleanText(text: string | undefined): string {
   if (!text) return "";
   let result = text;
 
+  // Decode HTML entities for slashes (HN encodes / as &#x2F;)
+  result = result.replace(/&#x2F;/gi, "/");
+
   // HN doesn't wrap first line in <p>, so wrap it for consistent styling
   if (!result.startsWith("<p") && result.includes("<p")) {
     const firstPIndex = result.indexOf("<p");
@@ -28,6 +31,12 @@ export default function cleanText(text: string | undefined): string {
       .replace(/(<br\s*\/?>(\s|&nbsp;)*)+$/gi, "") // Trailing <br> tags
       .replace(/(\s|&nbsp;)+$/gi, ""); // Trailing whitespace
   }
+
+  // Convert plain text URLs to clickable links (URLs with protocol)
+  result = result.replace(
+    /(?<!["'])(https?:\/\/[^\s<>"]+)/gi,
+    '<a href="$1">$1</a>'
+  );
 
   // Rewrite HN links to local links
   result = result

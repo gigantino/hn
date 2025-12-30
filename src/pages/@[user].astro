@@ -2,6 +2,7 @@
 import xss from "xss";
 import Layout from "@layouts/Layout.astro";
 import getRelativeTime from "@modules/getRelativeTime";
+import cleanText from "@modules/cleanText";
 
 const { user } = Astro.params;
 
@@ -13,39 +14,30 @@ const { id: username, created: createdAt, karma, about, submitted: posts } = dat
 ---
 
 <Layout title={`@${username}`}>
-  <span>
-    <b>Username:</b>
-    <span>{username}</span>
-  </span>
+  <div class="space-y-4">
+    <div class="flex gap-2">
+      <span class="font-semibold text-neutral-600 dark:text-neutral-400">Username:</span>
+      <span>{username}</span>
+    </div>
 
-  {
-    about && (
-      <span>
-        <b>About:</b>
-        <div set:html={xss(about)} />
-      </span>
-    )
-  }
+    {about && (
+      <div>
+        <span class="font-semibold text-neutral-600 dark:text-neutral-400">About:</span>
+        <div
+          class="mt-1 text-sm break-words [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_a]:break-all [&_code]:font-mono [&_code]:bg-neutral-200 dark:[&_code]:bg-neutral-700 [&_code]:text-[0.8em] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-neutral-200 dark:[&_pre]:bg-neutral-700 [&_pre]:p-3 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0"
+          set:html={cleanText(xss(about))}
+        />
+      </div>
+    )}
 
-  <span>
-    <b>Joined HN:</b>
-    <span>{getRelativeTime(createdAt)}</span>
-  </span>
+    <div class="flex gap-2">
+      <span class="font-semibold text-neutral-600 dark:text-neutral-400">Joined:</span>
+      <span>{getRelativeTime(createdAt)}</span>
+    </div>
 
-  <span>
-    <b>Karma:</b>
-    <span>{karma}</span>
-  </span>
+    <div class="flex gap-2">
+      <span class="font-semibold text-neutral-600 dark:text-neutral-400">Karma:</span>
+      <span>{karma.toLocaleString()}</span>
+    </div>
+  </div>
 </Layout>
-
-<style is:global>
-  p {
-    padding-top: 1vh;
-    padding-bottom: 1vh;
-  }
-  code {
-    display: block;
-    margin: 0 0 1em;
-    white-space: pre-wrap;
-  }
-</style>
