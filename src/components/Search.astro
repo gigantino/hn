@@ -1,4 +1,6 @@
 ---
+import SearchIcon from "@components/icons/Search.astro";
+
 interface Props {
   query?: string;
 }
@@ -9,13 +11,13 @@ const { query } = Astro.props;
 <form class="flex w-full justify-center" method="get" action="/search">
   <input
     type="text"
-    class="w-full rounded-tl-md border-y border-l border-neutral-500/40 bg-black p-1 pl-3 pr-3 focus:outline-none"
+    class="w-full rounded-tl-md border-y border-l border-gray-300 bg-white p-1 pl-3 pr-3 focus:outline-none dark:border-neutral-500/40 dark:bg-black"
     placeholder="Search..."
     name="q"
     id="q"
     value={query}
   />
-  <button type="submit" class="rounded-tr-md border border-neutral-500/40 p-2">
-    <img src="/icons/search.svg" alt="search" />
+  <button type="submit" class="rounded-tr-md border border-gray-300 p-2 dark:border-neutral-500/40">
+    <SearchIcon />
   </button>
 </form>

@@ -4,6 +4,7 @@ import xss from "xss";
 import getRelativeTime from "@modules/getRelativeTime";
 import Item from "@components/Item.astro";
 import type { HNComment } from "@/types/hn";
+import CommentIcon from "@components/icons/Comment.astro";
 
 interface Props {
   data: HNComment;
@@ -14,7 +15,7 @@ const { data } = Astro.props;
 <div class="py-3">
   <div
     class={`m-auto flex w-full max-w-screen-md flex-col
-    justify-between border-l border-neutral-500/40 pl-4`}
+    justify-between border-l border-gray-300 pl-4 dark:border-neutral-500/40`}
   >
     <div class="flex w-full flex-col break-words rounded-md">
       <!-- Author and time -->
@@ -40,7 +41,7 @@ const { data } = Astro.props;
     {
       Astro.url.pathname == `/item/${data.id}` ? (
         <div class="flex gap-1 text-sm">
-          <img src="/icons/comment.svg" alt="comment" />
+          <CommentIcon />
           <span>{data.kids?.length ?? 0}</span>
         </div>
       ) : (

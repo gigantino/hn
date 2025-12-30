@@ -1,27 +1,31 @@
 ---
+import StarIcon from "@components/icons/Star.astro";
+import UpvoteIcon from "@components/icons/Upvote.astro";
+import ClockIcon from "@components/icons/Clock.astro";
+
 const filter = Astro.url.searchParams.get("filter");
 const page = Astro.url.searchParams.get("page");
 
 type Category = {
   label: string;
-  icon: string;
+  icon: "star" | "upvote" | "clock";
   filter: string | null;
 };
 
 const categories: Category[] = [
   {
     label: "Trending",
-    icon: "/icons/star.svg",
+    icon: "star",
     filter: null,
   },
   {
     label: "Most upvoted",
-    icon: "/icons/upvote.svg",
+    icon: "upvote",
     filter: "top",
   },
   {
     label: "Newest",
-    icon: "/icons/clock.svg",
+    icon: "clock",
     filter: "new",
   },
 ];
@@ -48,18 +52,22 @@ const isSelected = (category: Category) => {
       isSelected(category) ? (
         <a class="hover:cursor-default hover:no-underline">
           <div class="flex flex-wrap justify-center gap-1 sm:justify-start">
-            <img src={category.icon} alt="upvote" />
+            {category.icon === "star" && <StarIcon />}
+            {category.icon === "upvote" && <UpvoteIcon />}
+            {category.icon === "clock" && <ClockIcon />}
             <span class="font-bold">{category.label}</span>
           </div>
         </a>
       ) : (
         <a href={linkFromCategory(category)}>
           <div class="flex flex-wrap justify-center gap-1 sm:justify-start">
-            <img src={category.icon} alt="upvote" />
+            {category.icon === "star" && <StarIcon />}
+            {category.icon === "upvote" && <UpvoteIcon />}
+            {category.icon === "clock" && <ClockIcon />}
             <span>{category.label}</span>
           </div>
         </a>
-      ),
+      )
     )
   }
 </div>

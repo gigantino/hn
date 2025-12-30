@@ -2,14 +2,15 @@
 import Search from "@components/Search.astro";
 ---
 
-<footer class="border-t border-neutral-500/40 bg-black p-3">
+<footer class="border-t border-gray-300 bg-white p-3 dark:border-neutral-500/40 dark:bg-black">
   <div class="m-auto flex w-full max-w-screen-md flex-col gap-3">
     <Search />
     <div class="flex w-full justify-between">
-      <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
+      <a class="text-xl font-extrabold text-neutral-900 hover:no-underline dark:text-white" href="/">[HN]</a>
       <div class="flex flex-row items-center justify-between gap-3 text-sm">
-        <a class="text-blue-500 hover:underline" href="https://github.com/gigantino/hn">GitHub</a>
-        <a class="text-blue-500 hover:underline" href="https://news.ycombinator.com">HackerNews</a>
+        <a href="/settings">Settings</a>
+        <a href="https://github.com/gigantino/hn">GitHub</a>
+        <a href="https://news.ycombinator.com">HackerNews</a>
       </div>
     </div>
   </div>

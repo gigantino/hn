@@ -5,6 +5,9 @@ import Item from "@components/Item.astro";
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
 import type { HNItem, HNComment } from "@/types/hn";
+import UpvoteIcon from "@components/icons/Upvote.astro";
+import CommentIcon from "@components/icons/Comment.astro";
+import ExternalLinkIcon from "@components/icons/ExternalLink.astro";
 
 interface Props {
   data: HNItem & { kids?: HNComment[] };
@@ -24,7 +27,7 @@ const { data } = Astro.props;
           </a>
           <span>{getRelativeTime(data.time)}</span>
         </div>
-        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-white">
+        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-neutral-900 dark:text-white">
           {data.title}
         </a>
       </div>
@@ -33,7 +36,7 @@ const { data } = Astro.props;
         data.url && (
           <span class="flex items-center gap-1 break-all text-sm">
             {extractDomainFromLink(data.url)}
-            <img src="/icons/link.svg" alt="External link" />
+            <ExternalLinkIcon />
           </span>
         )
       }
@@ -49,11 +52,11 @@ const { data } = Astro.props;
     <!-- Upvotes and comments -->
     <div class="flex flex-wrap items-center gap-3 py-3 text-sm">
       <div class="flex gap-1">
-        <img src="/icons/upvote.svg" alt="upvote" />
+        <UpvoteIcon />
         <span>{data.score ?? 0}</span>
       </div>
       <div class="flex gap-1">
-        <img src="/icons/comment.svg" alt="comment" />
+        <CommentIcon />
         <span>{data.descendants ?? 0}</span>
       </div>
     </div>

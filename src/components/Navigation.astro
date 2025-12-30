@@ -1,4 +1,6 @@
 ---
+import SearchIcon from "@components/icons/Search.astro";
+
 const filter = Astro.url.searchParams.get("filter");
 const q = Astro.url.searchParams.get("q");
 const isSearch = Astro.url.pathname.startsWith("/search");
@@ -28,9 +30,9 @@ const isSelected = (url: string) => {
 };
 ---
 
-<nav class="h-14 w-full border-b border-neutral-500/40 bg-black px-3">
+<nav class="h-14 w-full border-b border-gray-300 bg-white px-3 dark:border-neutral-500/40 dark:bg-black">
   <main class="m-auto flex h-full w-full max-w-screen-md items-center justify-between">
-    <a class="text-xl font-extrabold text-white hover:no-underline" href="/">[HN]</a>
+    <a class="text-xl font-extrabold text-neutral-900 hover:no-underline dark:text-white" href="/">[HN]</a>
     <div
       class={!isSearch
         ? "box-border flex items-center gap-3"
@@ -47,9 +49,9 @@ const isSelected = (url: string) => {
       }
       <label
         for="q"
-        class="block cursor-pointer rounded-md border border-neutral-500/40 p-2 text-white"
+        class="block cursor-pointer rounded-md border border-gray-300 p-2 text-neutral-900 dark:border-neutral-500/40 dark:text-white"
       >
-        <img src="/icons/search.svg" alt="search" />
+        <SearchIcon />
       </label>
     </div>
   </main>

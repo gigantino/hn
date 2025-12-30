@@ -9,10 +9,15 @@ export interface Props {
 }
 
 const { title, description } = getMetaTags(Astro.props.title, Astro.props.description);
+
+// Get theme from cookie
+const theme = Astro.cookies.get("theme")?.value || "system";
+// Apply class: "light" forces light, "dark" forces dark, "system" = no class (uses media query)
+const themeClass = theme === "system" ? "" : theme;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class={themeClass}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -22,14 +27,12 @@ const { title, description } = getMetaTags(Astro.props.title, Astro.props.descri
     <meta name="og:title" content={title} />
     <meta name="og:description" content={description} />
   </head>
-  <body>
-    <body class="min-w-fold bg-neutral-900 text-white">
-      <Navigation />
-      <div class="px-3">
-        <slot />
-      </div>
-      <Footer />
-    </body>
+  <body class="min-w-fold bg-gray-100 text-neutral-900 dark:bg-neutral-900 dark:text-white">
+    <Navigation />
+    <div class="px-3">
+      <slot />
+    </div>
+    <Footer />
   </body>
 </html>
 

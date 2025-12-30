@@ -2,6 +2,9 @@
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
 import type { HNItem } from "@/types/hn";
+import UpvoteIcon from "@components/icons/Upvote.astro";
+import CommentIcon from "@components/icons/Comment.astro";
+import ExternalLinkIcon from "@components/icons/ExternalLink.astro";
 
 interface Props {
   data: HNItem;
@@ -9,7 +12,7 @@ interface Props {
 const { data } = Astro.props;
 ---
 
-<div class="rounded-md border border-neutral-500/40 bg-black">
+<div class="rounded-md border border-gray-300 bg-white dark:border-neutral-500/40 dark:bg-black">
   <div class="flex w-full flex-col gap-2 break-words p-3">
     <!-- Author, time and title -->
     <div class="flex flex-col gap-1">
@@ -28,20 +31,20 @@ const { data } = Astro.props;
         data.url && (
           <span class="flex items-center gap-1 break-all text-sm">
             {extractDomainFromLink(data.url)}
-            <img src="/icons/link.svg" alt="External link" />
+            <ExternalLinkIcon />
           </span>
         )
       }
     </div>
-    <hr class="border-neutral-500/40" />
+    <hr class="border-gray-200 dark:border-neutral-500/40" />
     <!-- Upvotes and comments -->
     <div class="flex flex-wrap items-center gap-3 text-sm">
       <div class="flex gap-1">
-        <img src="/icons/upvote.svg" alt="upvote" />
+        <UpvoteIcon />
         <span>{data.score}</span>
       </div>
       <div class="flex gap-1">
-        <img src="/icons/comment.svg" alt="comment" />
+        <CommentIcon />
         <a class="cursor-pointer text-blue-500 hover:underline" href={`/item/${data.id}`}>
           {`${data.descendants ?? 0} ${data.descendants === 1 ? "comment" : "comments"}`}
         </a>

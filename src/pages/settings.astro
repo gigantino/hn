@@ -1,0 +1,81 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+// Get current theme from cookie
+const theme = Astro.cookies.get("theme")?.value || "system";
+---
+
+<Layout title="Settings">
+  <div class="flex flex-col gap-6">
+    <h1 class="text-2xl font-bold">Settings</h1>
+
+    <section class="flex flex-col gap-3">
+      <h2 class="text-lg font-semibold">Theme</h2>
+      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+        Choose how the site looks to you. Select "System" to automatically match your device's
+        settings.
+      </p>
+
+      <form method="POST" action="/api/theme" class="flex flex-col gap-3">
+        <input type="hidden" name="redirect" value="/settings" />
+
+        <label
+          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "system" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
+        >
+          <input
+            type="radio"
+            name="theme"
+            value="system"
+            checked={theme === "system"}
+            class="h-4 w-4 accent-blue-500"
+          />
+          <div class="flex flex-col">
+            <span class="font-medium">System</span>
+            <span class="text-sm text-neutral-600 dark:text-neutral-400">
+              Follow your device's theme
+            </span>
+          </div>
+        </label>
+
+        <label
+          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "light" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
+        >
+          <input
+            type="radio"
+            name="theme"
+            value="light"
+            checked={theme === "light"}
+            class="h-4 w-4 accent-blue-500"
+          />
+          <div class="flex flex-col">
+            <span class="font-medium">Light</span>
+            <span class="text-sm text-neutral-600 dark:text-neutral-400">Always use light mode</span>
+          </div>
+        </label>
+
+        <label
+          class={`flex cursor-pointer items-center gap-3 rounded-md border p-3 ${theme === "dark" ? "border-blue-500 bg-blue-50 dark:bg-blue-950" : "border-neutral-200 dark:border-neutral-700"}`}
+        >
+          <input
+            type="radio"
+            name="theme"
+            value="dark"
+            checked={theme === "dark"}
+            class="h-4 w-4 accent-blue-500"
+          />
+          <div class="flex flex-col">
+            <span class="font-medium">Dark</span>
+            <span class="text-sm text-neutral-600 dark:text-neutral-400">Always use dark mode</span>
+          </div>
+        </label>
+
+        <button
+          type="submit"
+          class="mt-2 w-fit rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+        >
+          Save
+        </button>
+      </form>
+    </section>
+  </div>
+</Layout>
