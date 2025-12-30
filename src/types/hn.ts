@@ -30,6 +30,7 @@ export interface HNComment {
   time: number;
   score?: number;
   kids?: HNComment[];
+  kidsCount?: number; // Total number of direct replies (even if not all are fetched)
 }
 
 export interface HNUser {

@@ -1,36 +1,33 @@
 ---
 import xss from "xss";
-
-import Item from "@components/Item.astro";
 import getRelativeTime from "@modules/getRelativeTime";
 import extractDomainFromLink from "@modules/extractDomainFromLink";
-import type { HNItem, HNComment } from "@/types/hn";
+import cleanText from "@modules/cleanText";
+import type { HNItem } from "@/types/hn";
 import UpvoteIcon from "@components/icons/Upvote.astro";
 import CommentIcon from "@components/icons/Comment.astro";
 import ExternalLinkIcon from "@components/icons/ExternalLink.astro";
 
 interface Props {
-  data: HNItem & { kids?: HNComment[] };
+  data: HNItem;
 }
 const { data } = Astro.props;
 ---
 
-<div class="py-3">
-  <div class="m-auto flex w-full max-w-screen-md flex-col justify-between">
-    <div class="flex w-full flex-col break-words">
-      <!-- Author, time and title -->
-      <div class="flex flex-col">
-        <div class="text-sm">
-          <span>Posted by</span>
-          <a href={`/@${data.by}`} class="text-blue-500 hover:underline">
-            {data.by}
-          </a>
-          <span>{getRelativeTime(data.time)}</span>
-        </div>
-        <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold text-neutral-900 dark:text-white">
-          {data.title}
+<div class="m-auto max-w-screen-md rounded-md border border-gray-300 bg-white dark:border-neutral-500/40 dark:bg-black">
+  <div class="flex w-full flex-col gap-2 break-words p-3">
+    <!-- Author, time and title -->
+    <div class="flex flex-col gap-1">
+      <div class="text-sm">
+        {"Posted by "}
+        <a href={`/@${data.by}`}>
+          {data.by}
         </a>
+        {` ${getRelativeTime(data.time)}`}
       </div>
+      <a href={data.url ? data.url : `/item/${data.id}`} class="font-bold">
+        {data.title}
+      </a>
       <!-- External URL -->
       {
         data.url && (
@@ -40,17 +37,21 @@ const { data } = Astro.props;
           </span>
         )
       }
-      <!-- Post description -->
-      {
-        data.text && (
-          <div class="overflow-y-hidden break-words">
-            <p class="p-0" set:html={xss(data.text)} />
-          </div>
-        )
-      }
     </div>
+
+    {data.text && (
+      <>
+        <hr class="border-gray-200 dark:border-neutral-500/40" />
+        <div
+          class="text-sm text-neutral-700 dark:text-neutral-300 [&>p]:my-2 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_code]:font-mono [&_code]:bg-neutral-200 dark:[&_code]:bg-neutral-700 [&_code]:text-[0.8em] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-neutral-200 dark:[&_pre]:bg-neutral-700 [&_pre]:p-3 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_.quote]:border-l-2 [&_.quote]:border-neutral-300 dark:[&_.quote]:border-neutral-600 [&_.quote]:pl-3 [&_.quote]:text-neutral-600 dark:[&_.quote]:text-neutral-400 [&_.quote]:italic"
+          set:html={cleanText(xss(data.text))}
+        />
+      </>
+    )}
+
+    <hr class="border-gray-200 dark:border-neutral-500/40" />
     <!-- Upvotes and comments -->
-    <div class="flex flex-wrap items-center gap-3 py-3 text-sm">
+    <div class="flex flex-wrap items-center gap-3 text-sm">
       <div class="flex gap-1">
         <UpvoteIcon />
         <span>{data.score ?? 0}</span>
@@ -59,10 +60,6 @@ const { data } = Astro.props;
         <CommentIcon />
         <span>{data.descendants ?? 0}</span>
       </div>
-    </div>
-    <!-- Nested comments (recursive) -->
-    <div>
-      {data.kids?.map((kid) => <Item data={kid} />)}
     </div>
   </div>
 </div>

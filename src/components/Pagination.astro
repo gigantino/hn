@@ -1,22 +1,37 @@
 ---
-export interface Props {
-  isLastPage: boolean;
-  page: number;
-  filter: string | null;
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
 }
-const { isLastPage, page, filter } = Astro.props;
 
-// Create the URL without losing the current filters
-let url = `${Astro.url.pathname}/?page=${page + 1}`.replace("//", "/");
-if (filter) url += `&filter=${filter}`;
+const { currentPage, totalPages, baseUrl } = Astro.props;
+const hasPrevPage = currentPage > 1;
+const hasNextPage = currentPage < totalPages;
 ---
 
-{
-  !isLastPage && (
-    <div class="flex w-full justify-center gap-3">
-      <a href={url} class="w-full text-center text-blue-600">
-        View more
-      </a>
+{(hasPrevPage || hasNextPage) && (
+  <div class="flex items-center justify-between text-sm">
+    <span class="text-neutral-500 dark:text-neutral-400">
+      Page {currentPage} of {totalPages}
+    </span>
+    <div class="flex gap-4">
+      {hasPrevPage && (
+        <a
+          href={`${baseUrl}?page=${currentPage - 1}`}
+          class="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          ← Previous
+        </a>
+      )}
+      {hasNextPage && (
+        <a
+          href={`${baseUrl}?page=${currentPage + 1}`}
+          class="text-blue-600 hover:underline dark:text-blue-400"
+        >
+          Next →
+        </a>
+      )}
     </div>
-  )
-}
+  </div>
+)}

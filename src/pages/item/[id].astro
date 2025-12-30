@@ -1,28 +1,26 @@
 ---
 import ItemLayout from "@layouts/ItemLayout.astro";
-import Item from "@components/Item.astro";
+import Comment from "@components/Comment.astro";
 import Story from "@components/Story.astro";
-import type { HNComment } from "@/types/hn";
+import Pagination from "@components/Pagination.astro";
+import type { HNComment, HNItem } from "@/types/hn";
 
 const { id } = Astro.params;
 
-const getPostComments = async (postId: number) => {
+// Pagination: page-based, fixed comments per page
+const commentsPerPage = 10;
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get("page") || "1"));
+const fromPage = parseInt(Astro.url.searchParams.get("fromPage") || "0");
+const fromComment = Astro.url.searchParams.get("fromComment") || "";
+
+const getPost = async (postId: number): Promise<HNItem | null> => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${postId}.json`);
   const post = await response.json();
-
-  // Return directly, it will redirect if the data is undefined.
-  if (!post) return;
-
-  const commentIds: number[] = post.kids || [];
-  const comments = await Promise.all(commentIds.map((id) => getComment(id)));
-
-  const kids = comments.filter((comment): comment is HNComment => comment !== null);
-  post.kids = kids;
-
+  if (!post) return null;
   return post;
 };
 
-const getComment = async (commentId: number): Promise<HNComment | null> => {
+const getComment = async (commentId: number, depth: number = 0): Promise<HNComment | null> => {
   const response = await fetch(`${import.meta.env.HN_API}/item/${commentId}.json`);
   const comment = await response.json();
 
@@ -30,8 +28,18 @@ const getComment = async (commentId: number): Promise<HNComment | null> => {
     return null;
   }
 
-  const nestedCommentIds: number[] = comment.kids || [];
-  const nestedComments = await Promise.all(nestedCommentIds.map((id) => getComment(id)));
+  // Only fetch nested comments up to depth 5, and limit to 3 per level for performance
+  const maxDepth = 5;
+  const maxPerLevel = 3;
+  let kids: HNComment[] = [];
+
+  if (depth < maxDepth && comment.kids?.length) {
+    const idsToFetch = comment.kids.slice(0, maxPerLevel);
+    const nestedComments = await Promise.all(
+      idsToFetch.map((id: number) => getComment(id, depth + 1))
+    );
+    kids = nestedComments.filter((c): c is HNComment => c !== null);
+  }
 
   return {
     id: comment.id,
@@ -39,14 +47,97 @@ const getComment = async (commentId: number): Promise<HNComment | null> => {
     by: comment.by,
     time: comment.time,
     score: comment.score,
-    kids: nestedComments.filter((comment): comment is HNComment => comment !== null),
+    kids: kids.length > 0 ? kids : undefined,
+    kidsCount: comment.kids?.length || 0,
   };
 };
 
-const data = await getPostComments(Number(id));
-if (!data) return Astro.redirect("/404");
+const post = await getPost(Number(id));
+if (!post) return Astro.redirect("/404");
+
+// If this is a comment, fetch parent chain for context
+let parentStory: HNItem | null = null;
+let topLevelCommentId: number | null = null;
+let commentPageNumber: number = 1;
+
+if (post.type === "comment" && post.parent) {
+  // Walk up to find the root story and track the top-level comment
+  let currentId = post.id;
+  let currentParentId = post.parent;
+
+  while (currentParentId) {
+    const parent = await getPost(currentParentId);
+    if (!parent) break;
+    if (parent.type === "story") {
+      parentStory = parent;
+      topLevelCommentId = currentId;
+      // Find which page this top-level comment is on
+      const commentIndex = parent.kids?.indexOf(topLevelCommentId) ?? -1;
+      if (commentIndex >= 0) {
+        commentPageNumber = Math.floor(commentIndex / commentsPerPage) + 1;
+      }
+      break;
+    }
+    currentId = currentParentId;
+    currentParentId = parent.parent;
+  }
+}
+
+// Fetch top-level comments with page-based pagination
+const allCommentIds: number[] = post.kids || [];
+const totalComments = allCommentIds.length;
+const totalPages = Math.ceil(totalComments / commentsPerPage);
+
+// Redirect to last valid page if requested page is out of bounds
+if (currentPage > totalPages && totalPages > 0) {
+  return Astro.redirect(`/item/${id}?page=${totalPages}`);
+}
+
+const startIndex = (currentPage - 1) * commentsPerPage;
+const commentIdsToFetch = allCommentIds.slice(startIndex, startIndex + commentsPerPage);
+
+const comments = await Promise.all(commentIdsToFetch.map((cid) => getComment(cid, 0)));
+const validComments = comments.filter((c): c is HNComment => c !== null);
 ---
 
-<ItemLayout title={data.title ? data.title : `Item ${data.id}`} description={data.text}>
-  {data.type == "story" ? <Story data={data} /> : <Item data={data} />}
+<ItemLayout title={post.title || `Item ${post.id}`} description={post.text}>
+  {post.type === "story" && <Story data={post} />}
+
+  {post.type === "comment" && (
+    <div class="m-auto max-w-screen-md">
+      {parentStory && topLevelCommentId && (
+        <a
+          href={`/item/${parentStory.id}${(fromPage || commentPageNumber) > 1 ? `?page=${fromPage || commentPageNumber}` : ''}#c-${fromComment || topLevelCommentId}`}
+          class="inline-block mb-4 text-sm text-blue-600 hover:underline dark:text-blue-400"
+        >
+          ← Back to: {parentStory.title}
+        </a>
+      )}
+      <Comment data={{ id: post.id, text: post.text || "", by: post.by, time: post.time, kids: validComments, kidsCount: post.kids?.length || 0 }} isLight={true} hideThreadLink={true} storyPage={fromPage || commentPageNumber} />
+    </div>
+  )}
+
+  {post.type === "story" && (
+    <div class="m-auto max-w-screen-md mt-6">
+      {validComments.length > 0 ? (
+        <div class="space-y-4">
+          {validComments.map((comment) => (
+            <Comment data={comment} isLight={true} storyPage={currentPage} />
+          ))}
+        </div>
+      ) : (
+        <p class="text-neutral-500 dark:text-neutral-400 text-sm">No comments yet.</p>
+      )}
+
+      <div class="mt-6">
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/item/${id}`} />
+      </div>
+    </div>
+  )}
+
+  {post.type === "comment" && totalPages > 1 && (
+    <div class="m-auto max-w-screen-md mt-6">
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/item/${id}`} />
+    </div>
+  )}
 </ItemLayout>

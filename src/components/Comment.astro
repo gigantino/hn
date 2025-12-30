@@ -1,0 +1,107 @@
+---
+import xss from "xss";
+import getRelativeTime from "@modules/getRelativeTime";
+import cleanText from "@modules/cleanText";
+import type { HNComment } from "@/types/hn";
+
+interface Props {
+  data: HNComment;
+  depth?: number;
+  maxDepth?: number;
+  maxRepliesPerLevel?: number;
+  isLight?: boolean;
+  hideThreadLink?: boolean;
+  storyPage?: number;
+}
+
+const { data, depth = 0, maxDepth = 5, maxRepliesPerLevel = 3, isLight = true, hideThreadLink = false, storyPage = 1 } = Astro.props;
+
+const replies = data.kids ?? [];
+const visibleReplies = replies.slice(0, maxRepliesPerLevel);
+const hiddenRepliesCount = replies.length - visibleReplies.length;
+const totalReplies = data.kidsCount ?? replies.length;
+const hasUnfetchedReplies = totalReplies > 0 && replies.length === 0;
+
+// Color bands for thread depth (alternating accent colors on left border)
+const depthColors = [
+  "border-l-blue-400",
+  "border-l-green-400",
+  "border-l-yellow-400",
+  "border-l-purple-400",
+  "border-l-pink-400",
+  "border-l-orange-400",
+];
+const borderColor = depthColors[depth % depthColors.length];
+
+// Background color based on parent (alternates)
+const bgColor = isLight
+  ? "bg-white dark:bg-black"
+  : "bg-gray-100 dark:bg-neutral-900";
+---
+
+<div id={`c-${data.id}`} class={depth > 0 ? "ml-2 sm:ml-4 mt-4" : ""}>
+  <div class={`py-2 px-3 rounded-md border-y border-r border-t-gray-300 border-r-gray-300 border-b-gray-300 dark:border-t-neutral-500/40 dark:border-r-neutral-500/40 dark:border-b-neutral-500/40 border-l-2 ${borderColor} ${bgColor}`}>
+    <!-- Comment header -->
+    <div class="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
+      <a
+        href={`/@${data.by}`}
+        class="font-medium text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {data.by}
+      </a>
+      <span>·</span>
+      <span>{getRelativeTime(data.time)}</span>
+      {!hideThreadLink && totalReplies > 0 && (
+        <>
+          <span>·</span>
+          <a href={`/item/${data.id}?fromPage=${storyPage}&fromComment=${data.id}`} class="text-blue-600 hover:underline dark:text-blue-400">
+            view thread
+          </a>
+        </>
+      )}
+    </div>
+
+    <!-- Comment body -->
+    <div
+      class="mt-1 text-sm text-neutral-800 dark:text-neutral-200 [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_code]:font-mono [&_code]:bg-neutral-200 dark:[&_code]:bg-neutral-700 [&_code]:text-[0.8em] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-neutral-200 dark:[&_pre]:bg-neutral-700 [&_pre]:p-3 [&_pre]:rounded-md [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_.quote]:border-l-2 [&_.quote]:border-neutral-300 dark:[&_.quote]:border-neutral-600 [&_.quote]:pl-3 [&_.quote]:text-neutral-600 dark:[&_.quote]:text-neutral-400 [&_.quote]:italic"
+      set:html={cleanText(xss(data.text || ""))}
+    />
+
+    <!-- Nested replies -->
+    {depth < maxDepth && visibleReplies.length > 0 && (
+      <div class="mt-2">
+        {visibleReplies.map((reply) => (
+          <Astro.self
+            data={reply}
+            depth={depth + 1}
+            maxDepth={maxDepth}
+            maxRepliesPerLevel={maxRepliesPerLevel}
+            isLight={!isLight}
+            hideThreadLink={hideThreadLink}
+            storyPage={storyPage}
+          />
+        ))}
+      </div>
+    )}
+
+    <!-- Show more replies link (when some replies are hidden) -->
+    {!hideThreadLink && hiddenRepliesCount > 0 && depth < maxDepth && (
+      <a
+        href={`/item/${data.id}?fromPage=${storyPage}&fromComment=${data.id}`}
+        class="inline-block mt-2 text-xs text-blue-600 hover:underline dark:text-blue-400"
+      >
+        ↳ {hiddenRepliesCount} more {hiddenRepliesCount === 1 ? "reply" : "replies"}
+      </a>
+    )}
+
+    <!-- Continue thread link (when max depth reached OR replies not fetched) -->
+    {!hideThreadLink && ((depth >= maxDepth && totalReplies > 0) || hasUnfetchedReplies) && (
+      <a
+        href={`/item/${data.id}?fromPage=${storyPage}&fromComment=${data.id}`}
+        class="inline-block mt-2 text-xs text-blue-600 hover:underline dark:text-blue-400"
+      >
+        ↳ Continue thread ({totalReplies} {totalReplies === 1 ? "reply" : "replies"})
+      </a>
+    )}
+  </div>
+</div>
