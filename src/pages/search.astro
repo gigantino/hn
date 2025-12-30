@@ -1,10 +1,21 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
+import Pagination from "@components/Pagination.astro";
 import makeSearch from "@modules/makeSearch";
 
-const query = Astro.url.searchParams.get("q");
-const posts = await makeSearch(query);
+const query = Astro.url.searchParams.get("q") || "";
+const rawPage = parseInt(Astro.url.searchParams.get("page") || "1", 10);
+const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+
+const { hits: posts, totalResults, totalPages, currentPage } = query
+  ? await makeSearch(query, page)
+  : { hits: [], totalResults: 0, totalPages: 0, currentPage: 1 };
+
+// Redirect to last valid page if page is out of bounds
+if (query && totalPages > 0 && page > totalPages) {
+  return Astro.redirect(`/search?q=${encodeURIComponent(query)}&page=${totalPages}`);
+}
 
 // Get bookmarked IDs from cookie
 const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
@@ -16,11 +27,21 @@ const bookmarkedIds = new Set(
 ---
 
 <Layout title={`${query} on HackerNews`}>
-  {
-    posts.map((post) => {
-      if (!post.title) return;
+  {query && (
+    <div class="mb-1 text-sm text-neutral-600 dark:text-neutral-400 text-center">
+      <span class="font-medium">{totalResults.toLocaleString()}</span> results for "<span class="font-medium">{query}</span>"
+    </div>
+  )}
 
-      return <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />;
-    })
-  }
+  <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/search?q=${encodeURIComponent(query)}`} />
+  <div class="flex flex-col gap-3">
+    {
+      posts.map((post) => {
+        if (!post.title) return;
+
+        return <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />;
+      })
+    }
+  </div>
+  <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/search?q=${encodeURIComponent(query)}`} />
 </Layout>
