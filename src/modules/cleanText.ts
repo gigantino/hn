@@ -2,6 +2,7 @@
  * Clean up HTML text from HN API:
  * - Wrap unwrapped first lines in <p> tags for consistent styling
  * - Remove trailing empty paragraphs, <br> tags, and whitespace
+ * - Restore full URLs that HN truncates with an ellipsis in link text
  * - Rewrite HN links to local links
  * - Convert HN-style quotes (> at start of paragraph) to styled blockquotes
  */
@@ -32,10 +33,19 @@ export default function cleanText(text: string | undefined): string {
       .replace(/(\s|&nbsp;)+$/gi, ""); // Trailing whitespace
   }
 
-  // Convert plain text URLs to clickable links (URLs with protocol)
+  // HN truncates long link text to ~60 chars and appends "..." while keeping
+  // the full URL in href. Restore the full URL as the visible link text.
   result = result.replace(
-    /(?<!["'])(https?:\/\/[^\s<>"]+)/gi,
-    '<a href="$1">$1</a>'
+    /(<a\s+href="([^"]*)"[^>]*>)[^<]*(?:\.\.\.|…)<\/a>/gi,
+    "$1$2</a>"
+  );
+
+  // Convert plain text URLs to clickable links (URLs with protocol).
+  // Match whole anchor tags first so URLs already inside a link aren't
+  // double-wrapped, then linkify any remaining bare URLs.
+  result = result.replace(
+    /<a\b[^>]*>.*?<\/a>|(https?:\/\/[^\s<>"]+)/gis,
+    (match, bareUrl) => (bareUrl ? `<a href="${bareUrl}">${bareUrl}</a>` : match)
   );
 
   // Rewrite HN links to local links
