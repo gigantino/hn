@@ -1,8 +1,11 @@
 ---
 import Layout from "@layouts/Layout.astro";
+import validateZoom, { zoomLevels } from "@modules/zoom";
 
 // Get current theme from cookie
 const theme = Astro.cookies.get("theme")?.value || "system";
+
+const zoom = validateZoom(Astro.cookies.get("zoom")?.value);
 ---
 
 <Layout title="Settings">
@@ -57,6 +60,47 @@ const theme = Astro.cookies.get("theme")?.value || "system";
           </label>
 
           <span class="text-neutral-300 dark:text-neutral-600">|</span>
+
+          <button
+            type="submit"
+            class="text-blue-600 hover:underline dark:text-blue-400"
+          >
+            save
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="text-lg font-semibold">Zoom</h2>
+      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+        Adjust the size of text across the site.
+      </p>
+
+      <form method="POST" action="/api/zoom" class="flex flex-col gap-2">
+        <input type="hidden" name="redirect" value="/settings" />
+
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          {
+            zoomLevels.map((level) => (
+              <>
+                <label class="flex cursor-pointer items-center gap-1.5">
+                  <input
+                    type="radio"
+                    name="zoom"
+                    value={level}
+                    checked={zoom === level}
+                    class="accent-blue-500"
+                  />
+                  <span class={zoom === level ? "text-blue-600 dark:text-blue-400" : ""}>
+                    {level}%
+                  </span>
+                </label>
+
+                <span class="text-neutral-300 dark:text-neutral-600">|</span>
+              </>
+            ))
+          }
 
           <button
             type="submit"

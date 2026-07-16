@@ -3,6 +3,7 @@ import Navigation from "@components/Navigation.astro";
 import Filters from "@components/Filters.astro";
 import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
+import validateZoom from "@modules/zoom";
 import "../styles/global.css";
 
 export interface Props {
@@ -20,10 +21,13 @@ const ogImageUrl = new URL(`/api/og?${ogImageParams.toString()}`, Astro.url.orig
 const theme = Astro.cookies.get("theme")?.value || "system";
 // Apply class: "light" forces light, "dark" forces dark, "system" = no class (uses media query)
 const themeClass = theme === "system" ? "" : theme;
+
+const zoom = validateZoom(Astro.cookies.get("zoom")?.value);
+const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
 ---
 
 <!doctype html>
-<html lang="en" class={themeClass}>
+<html lang="en" class={themeClass} style={zoomStyle}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
