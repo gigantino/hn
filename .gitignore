@@ -1,9 +1,13 @@
 # build output
 dist/
-.vercel/
+
+# cloudflare / wrangler
+.wrangler/
+.dev.vars
 
 # generated types
 .astro/
+worker-configuration.d.ts
 
 # dependencies
 node_modules/
