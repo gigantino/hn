@@ -3,6 +3,7 @@ import Navigation from "@components/Navigation.astro";
 import Filters from "@components/Filters.astro";
 import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
+import { getCanonicalUrl } from "@modules/canonical";
 import validateZoom from "@modules/zoom";
 import "../styles/global.css";
 
@@ -11,6 +12,8 @@ export interface Props {
 }
 
 const { title, description } = getMetaTags(Astro.props.title);
+
+const canonicalUrl = getCanonicalUrl(Astro.url);
 
 // Build OG image URL
 const ogImageParams = new URLSearchParams();
@@ -33,7 +36,7 @@ const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={canonicalUrl} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <!-- Open Graph -->

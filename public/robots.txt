@@ -1,2 +1,10 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /api/theme
+Disallow: /api/zoom
+Disallow: /api/bookmarks
+Disallow: /settings
+Disallow: /bookmarks
+Disallow: /search
+
+Sitemap: https://hn.ggtn.ch/sitemap.xml
