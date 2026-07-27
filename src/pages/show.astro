@@ -3,6 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
+import { applyEdgeCache } from "@modules/cache";
 
 const req = await fetch(`${import.meta.env.HN_API}/showstories.json`);
 const page = getPage(Astro);
@@ -42,6 +43,8 @@ const posts = await Promise.all(
 if (posts.length == 0 && page === 1) return Astro.redirect("/404");
 
 const baseUrl = filter ? `/show?filter=${filter}` : "/show";
+
+applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
 <Layout title="Show">

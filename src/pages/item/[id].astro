@@ -3,6 +3,7 @@ import ItemLayout from "@layouts/ItemLayout.astro";
 import Comment from "@components/Comment.astro";
 import Story from "@components/Story.astro";
 import Pagination from "@components/Pagination.astro";
+import { applyEdgeCache } from "@modules/cache";
 import type { HNComment, HNItem } from "@/types/hn";
 
 const { id } = Astro.params;
@@ -106,6 +107,8 @@ const commentIdsToFetch = allCommentIds.slice(startIndex, startIndex + commentsP
 
 const comments = await Promise.all(commentIdsToFetch.map((cid) => getComment(cid, 0)));
 const validComments = comments.filter((c): c is HNComment => c !== null);
+
+applyEdgeCache(Astro.cookies, Astro.response, 300);
 ---
 
 <ItemLayout title={post.title || `Item ${post.id}`} description={post.text} author={post.by} score={post.score} comments={post.descendants}>
