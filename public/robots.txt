@@ -6,5 +6,6 @@ Disallow: /api/bookmarks
 Disallow: /settings
 Disallow: /bookmarks
 Disallow: /search
+Disallow: /@
 
 Sitemap: https://hn.ggtn.ch/sitemap.xml
