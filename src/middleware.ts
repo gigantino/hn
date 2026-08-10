@@ -21,7 +21,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 
   const cacheKey = new Request(context.request.url, { method: "GET" });
   const cached = await cache.match(cacheKey);
-  if (cached) return cached;
+  if (cached) return new Response(cached.body, cached);
 
   const response = await next();
   if (response.status !== 200 || response.headers.has("set-cookie")) return response;
