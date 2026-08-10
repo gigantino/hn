@@ -27,11 +27,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   if (response.status !== 200 || response.headers.has("set-cookie")) return response;
   if (!(response.headers.get("cache-control") || "").includes("s-maxage")) return response;
 
-  const ctx = (
-    context.locals as { runtime?: { ctx?: { waitUntil: (promise: Promise<unknown>) => void } } }
-  ).runtime?.ctx;
   const stored = cache.put(cacheKey, response.clone());
-  if (ctx) ctx.waitUntil(stored);
+  context.locals.cfContext.waitUntil(stored);
 
   return response;
 };
