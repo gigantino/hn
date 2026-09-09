@@ -1,7 +1,16 @@
 import type { MiddlewareHandler } from "astro";
+import { BLOCKED_CRAWLERS } from "@modules/crawlers";
 
 const CACHEABLE_PATHS = [/^\/$/, /^\/show$/, /^\/ask$/, /^\/item\/\d+$/];
 const PERSONALIZATION_COOKIES = ["theme", "zoom", "bookmarks"];
+const BLOCKED_AGENTS = BLOCKED_CRAWLERS.map((agent) => agent.toLowerCase());
+
+const isBlockedAgent = (request: Request) => {
+  const agent = request.headers.get("user-agent")?.toLowerCase();
+  if (!agent) return false;
+
+  return BLOCKED_AGENTS.some((name) => agent.includes(name));
+};
 
 const isCacheable = (request: Request) => {
   if (request.method !== "GET") return false;
@@ -16,6 +25,16 @@ const isCacheable = (request: Request) => {
 };
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
+  // RFC 9309: a 4xx on /robots.txt means "no restrictions", so serve it to everyone.
+  const isRobots = new URL(context.request.url).pathname === "/robots.txt";
+
+  if (!isRobots && isBlockedAgent(context.request)) {
+    return new Response("Not available to this crawler.\n", {
+      status: 403,
+      headers: { "cache-control": "no-store" },
+    });
+  }
+
   const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
   if (!cache || !isCacheable(context.request)) return next();
 
