@@ -19,3 +19,12 @@ export const BLOCKED_CRAWLERS = [
   "SeekportBot",
   "serpstatbot",
 ];
+
+export const ALLOWED_BOT_CATEGORIES = [
+  "Search Engine Crawler",
+  "AI Search",
+  "AI Assistant",
+  "Page Preview",
+  "Feed Fetcher",
+  "Archiver",
+];

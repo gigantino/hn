@@ -1,15 +1,23 @@
 import type { MiddlewareHandler } from "astro";
-import { BLOCKED_CRAWLERS } from "@modules/crawlers";
+import { ALLOWED_BOT_CATEGORIES, BLOCKED_CRAWLERS } from "@modules/crawlers";
 
 const CACHEABLE_PATHS = [/^\/$/, /^\/show$/, /^\/ask$/, /^\/item\/\d+$/];
 const PERSONALIZATION_COOKIES = ["theme", "zoom", "bookmarks"];
 const BLOCKED_AGENTS = BLOCKED_CRAWLERS.map((agent) => agent.toLowerCase());
+const ALLOWED_CATEGORIES = new Set(ALLOWED_BOT_CATEGORIES);
 
 const isBlockedAgent = (request: Request) => {
   const agent = request.headers.get("user-agent")?.toLowerCase();
   if (!agent) return false;
 
   return BLOCKED_AGENTS.some((name) => agent.includes(name));
+};
+
+const isBlockedBot = (request: Request) => {
+  const { verifiedBotCategory } = (request as { cf?: { verifiedBotCategory?: string } }).cf ?? {};
+  if (!verifiedBotCategory) return isBlockedAgent(request);
+
+  return !ALLOWED_CATEGORIES.has(verifiedBotCategory);
 };
 
 const isCacheable = (request: Request) => {
@@ -25,10 +33,9 @@ const isCacheable = (request: Request) => {
 };
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
-  // RFC 9309: a 4xx on /robots.txt means "no restrictions", so serve it to everyone.
   const isRobots = new URL(context.request.url).pathname === "/robots.txt";
 
-  if (!isRobots && isBlockedAgent(context.request)) {
+  if (!isRobots && isBlockedBot(context.request)) {
     return new Response("Not available to this crawler.\n", {
       status: 403,
       headers: { "cache-control": "no-store" },
