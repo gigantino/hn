@@ -4,32 +4,35 @@ import Comment from "@components/Comment.astro";
 import Story from "@components/Story.astro";
 import Pagination from "@components/Pagination.astro";
 import { applyEdgeCache } from "@modules/cache";
+import getItem from "@modules/getItem";
 import type { HNComment, HNItem } from "@/types/hn";
 
 const { id } = Astro.params;
 
-// Pagination: page-based, fixed comments per page
 const commentsPerPage = 10;
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get("page") || "1"));
 const fromPage = parseInt(Astro.url.searchParams.get("fromPage") || "0");
 const fromComment = Astro.url.searchParams.get("fromComment") || "";
 
-const getPost = async (postId: number): Promise<HNItem | null> => {
-  const response = await fetch(`${import.meta.env.HN_API}/item/${postId}.json`);
-  const post = await response.json();
-  if (!post) return null;
-  return post;
-};
+const RENDER_BUDGET_MS = 4000;
+const ctx = Astro.locals.cfContext;
+const deadline = new AbortController();
+const timer = setTimeout(() => deadline.abort(), RENDER_BUDGET_MS);
+let truncated = false;
+
+const getWithinDeadline = (itemId: number) =>
+  getItem(itemId, { signal: deadline.signal, ctx }).catch(() => {
+    truncated = true;
+    return null;
+  });
 
 const getComment = async (commentId: number, depth: number = 0): Promise<HNComment | null> => {
-  const response = await fetch(`${import.meta.env.HN_API}/item/${commentId}.json`);
-  const comment = await response.json();
+  const comment = await getWithinDeadline(commentId);
 
   if (!comment || comment.deleted || comment.dead) {
     return null;
   }
 
-  // Only fetch nested comments up to depth 5, and limit to 3 per level for performance
   const maxDepth = 5;
   const maxPerLevel = 3;
   let kids: HNComment[] = [];
@@ -44,7 +47,7 @@ const getComment = async (commentId: number, depth: number = 0): Promise<HNComme
 
   return {
     id: comment.id,
-    text: comment.text,
+    text: comment.text ?? "",
     by: comment.by,
     time: comment.time,
     score: comment.score,
@@ -53,10 +56,9 @@ const getComment = async (commentId: number, depth: number = 0): Promise<HNComme
   };
 };
 
-const post = await getPost(Number(id));
+const post = await getItem(Number(id), { ctx });
 if (!post) return Astro.redirect("/404");
 
-// Get bookmarked IDs from cookie
 const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
 const bookmarkedIds = new Set(
   bookmarkCookie
@@ -64,23 +66,20 @@ const bookmarkedIds = new Set(
     : []
 );
 
-// If this is a comment, fetch parent chain for context
 let parentStory: HNItem | null = null;
 let topLevelCommentId: number | null = null;
 let commentPageNumber: number = 1;
 
 if (post.type === "comment" && post.parent) {
-  // Walk up to find the root story and track the top-level comment
   let currentId = post.id;
   let currentParentId = post.parent;
 
   while (currentParentId) {
-    const parent = await getPost(currentParentId);
+    const parent = await getWithinDeadline(currentParentId);
     if (!parent) break;
     if (parent.type === "story") {
       parentStory = parent;
       topLevelCommentId = currentId;
-      // Find which page this top-level comment is on
       const commentIndex = parent.kids?.indexOf(topLevelCommentId) ?? -1;
       if (commentIndex >= 0) {
         commentPageNumber = Math.floor(commentIndex / commentsPerPage) + 1;
@@ -92,12 +91,10 @@ if (post.type === "comment" && post.parent) {
   }
 }
 
-// Fetch top-level comments with page-based pagination
 const allCommentIds: number[] = post.kids || [];
 const totalComments = allCommentIds.length;
 const totalPages = Math.ceil(totalComments / commentsPerPage);
 
-// Redirect to last valid page if requested page is out of bounds
 if (currentPage > totalPages && totalPages > 0) {
   return Astro.redirect(`/item/${id}?page=${totalPages}`);
 }
@@ -106,9 +103,14 @@ const startIndex = (currentPage - 1) * commentsPerPage;
 const commentIdsToFetch = allCommentIds.slice(startIndex, startIndex + commentsPerPage);
 
 const comments = await Promise.all(commentIdsToFetch.map((cid) => getComment(cid, 0)));
+clearTimeout(timer);
 const validComments = comments.filter((c): c is HNComment => c !== null);
 
-applyEdgeCache(Astro.cookies, Astro.response, 300);
+if (truncated) {
+  Astro.response.headers.set("Cache-Control", "no-store");
+} else {
+  applyEdgeCache(Astro.cookies, Astro.response, 300);
+}
 ---
 
 <ItemLayout title={post.title || `Item ${post.id}`} description={post.text} author={post.by} score={post.score} comments={post.descendants}>
@@ -147,7 +149,7 @@ applyEdgeCache(Astro.cookies, Astro.response, 300);
           ))}
         </div>
       ) : (
-        <p class="text-neutral-500 dark:text-neutral-400 text-sm">No comments yet.</p>
+        <p class="text-neutral-500 dark:text-neutral-400 text-sm">{truncated ? "Comments took too long to load. Refresh to try again." : "No comments yet."}</p>
       )}
 
       <div class="mt-6">
