@@ -1,7 +1,6 @@
 ---
 import SearchIcon from "@components/icons/Search.astro";
 
-const filter = Astro.url.searchParams.get("filter");
 const isSearch = Astro.url.pathname.startsWith("/search");
 
 type NavLink = {
@@ -46,7 +45,7 @@ const isSelected = (url: string) => {
           isSelected(link.url) ? (
             <a class="font-bold hover:cursor-default hover:no-underline">{link.label}</a>
           ) : (
-            <a href={filter ? `${link.url}/?filter=${filter}` : link.url || "/"}>{link.label}</a>
+            <a href={link.url || "/"}>{link.label}</a>
           ),
         )
       }

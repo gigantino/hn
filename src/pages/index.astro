@@ -12,7 +12,8 @@ const INDEX_LISTS = new Map([
   ["top", "beststories"],
 ]);
 
-const listing = await loadListing(Astro, "/", INDEX_LISTS.get(Astro.url.searchParams.get("filter") ?? "") ?? "topstories");
+const filter = Astro.url.searchParams.get("filter");
+const listing = await loadListing(Astro, "/", INDEX_LISTS.get(filter ?? "") ?? "topstories", filter);
 if (listing instanceof Response) return listing;
 const { page, totalPages, posts, baseUrl } = listing;
 

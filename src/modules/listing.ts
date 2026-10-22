@@ -4,9 +4,8 @@ import type { HNItem } from "@/types/hn";
 
 const ITEMS_PER_PAGE = 20;
 
-const loadListing = async (Astro: AstroGlobal, basePath: string, list: string) => {
+const loadListing = async (Astro: AstroGlobal, basePath: string, list: string, filter?: string | null) => {
   const page = getPage(Astro.url);
-  const filter = Astro.url.searchParams.get("filter");
 
   const data: undefined | number[] = await (await fetch(`${import.meta.env.HN_API}/${list}.json`)).json();
   if (!data) return Astro.redirect("/404");
