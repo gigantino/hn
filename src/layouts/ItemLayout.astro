@@ -4,6 +4,7 @@ import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
 import { getCanonicalUrl } from "@modules/canonical";
 import validateZoom from "@modules/zoom";
+import { SITE_NAME, isIndexable } from "@modules/seo";
 import "../styles/global.css";
 
 export interface Props {
@@ -46,7 +47,9 @@ const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
     <link rel="canonical" href={canonicalUrl} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {!isIndexable(Astro.url) && <meta name="robots" content="noindex, follow" />}
     <!-- Open Graph -->
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:type" content="article" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

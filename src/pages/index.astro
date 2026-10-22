@@ -4,6 +4,7 @@ import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
 import { applyEdgeCache } from "@modules/cache";
+import { getListingTitle } from "@modules/seo";
 
 const page = getPage(Astro);
 
@@ -61,7 +62,7 @@ const baseUrl = filter ? `/?filter=${filter}` : "/";
 applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
-<Layout title="News">
+<Layout title={getListingTitle(undefined, Astro.url)}>
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
     {posts.map((post) => post.type == "story" && <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}

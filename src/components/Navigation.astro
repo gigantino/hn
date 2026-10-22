@@ -47,7 +47,7 @@ const isSelected = (url: string) => {
           isSelected(link.url) ? (
             <a class="font-bold hover:cursor-default hover:no-underline">{link.label}</a>
           ) : (
-            <a href={`${link.url}${filter ? `/?filter=${filter}` : ""}`}>{link.label}</a>
+            <a href={filter ? `${link.url}/?filter=${filter}` : link.url || "/"}>{link.label}</a>
           ),
         )
       }
