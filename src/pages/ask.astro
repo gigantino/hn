@@ -43,7 +43,7 @@ const baseUrl = filter ? `/ask?filter=${filter}` : "/ask";
 applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
-<Layout title={getListingTitle("Ask HN", Astro.url)} description="Ask HN: questions and discussions from the Hacker News community.">
+<Layout filters title={getListingTitle("Ask HN", Astro.url)} description="Ask HN: questions and discussions from the Hacker News community.">
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
     {posts.map((post) => <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}

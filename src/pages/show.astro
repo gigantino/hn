@@ -43,7 +43,7 @@ const baseUrl = filter ? `/show?filter=${filter}` : "/show";
 applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
-<Layout title={getListingTitle("Show HN", Astro.url)} description="Show HN: projects, tools and things people have made, shared on Hacker News.">
+<Layout filters title={getListingTitle("Show HN", Astro.url)} description="Show HN: projects, tools and things people have made, shared on Hacker News.">
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
     {posts.map((post) => <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}

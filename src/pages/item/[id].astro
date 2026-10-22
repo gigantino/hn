@@ -1,5 +1,5 @@
 ---
-import ItemLayout from "@layouts/ItemLayout.astro";
+import Layout from "@layouts/Layout.astro";
 import Comment from "@components/Comment.astro";
 import Story from "@components/Story.astro";
 import Pagination from "@components/Pagination.astro";
@@ -109,7 +109,7 @@ if (truncated) {
 }
 ---
 
-<ItemLayout title={post.title || `Item ${post.id}`} description={post.text} author={post.by} score={post.score} comments={post.descendants}>
+<Layout title={post.title || `Item ${post.id}`} description={post.text} article={{ author: post.by, score: post.score, comments: post.descendants }}>
   {post.type === "story" && <Story data={post} bookmarkedIds={bookmarkedIds} />}
 
   {post.type === "comment" && (
@@ -159,4 +159,4 @@ if (truncated) {
       <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/item/${id}`} />
     </div>
   )}
-</ItemLayout>
+</Layout>
