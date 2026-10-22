@@ -4,6 +4,7 @@ import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
 import { applyEdgeCache } from "@modules/cache";
+import { getListingTitle } from "@modules/seo";
 
 const req = await fetch(`${import.meta.env.HN_API}/askstories.json`);
 const page = getPage(Astro);
@@ -47,7 +48,7 @@ const baseUrl = filter ? `/ask?filter=${filter}` : "/ask";
 applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
-<Layout title="Ask">
+<Layout title={getListingTitle("Ask HN", Astro.url)} description="Ask HN: questions and discussions from the Hacker News community.">
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
     {posts.map((post) => <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}

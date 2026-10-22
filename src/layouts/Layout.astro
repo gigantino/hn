@@ -5,19 +5,23 @@ import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
 import { getCanonicalUrl } from "@modules/canonical";
 import validateZoom from "@modules/zoom";
+import { SITE_NAME, isIndexable, websiteJsonLd } from "@modules/seo";
 import "../styles/global.css";
 
 export interface Props {
-  title: string;
+  title?: string;
+  description?: string;
 }
 
-const { title, description } = getMetaTags(Astro.props.title);
+const { title, description } = getMetaTags(Astro.props.title, Astro.props.description);
+const indexable = isIndexable(Astro.url);
+const isHome = Astro.url.pathname === "/" && indexable;
 
 const canonicalUrl = getCanonicalUrl(Astro.url);
 
 // Build OG image URL
 const ogImageParams = new URLSearchParams();
-ogImageParams.set("title", Astro.props.title);
+ogImageParams.set("title", Astro.props.title ?? "Hacker News");
 const ogImageUrl = new URL(`/api/og?${ogImageParams.toString()}`, Astro.url.origin).toString();
 
 // Get theme from cookie
@@ -39,7 +43,10 @@ const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
     <link rel="canonical" href={canonicalUrl} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {!indexable && <meta name="robots" content="noindex, follow" />}
+    {isHome && <script type="application/ld+json" set:html={websiteJsonLd} />}
     <!-- Open Graph -->
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
