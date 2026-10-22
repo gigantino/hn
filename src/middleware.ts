@@ -1,8 +1,8 @@
 import type { MiddlewareHandler } from "astro";
+import { PERSONALIZATION_COOKIES } from "@modules/cookies";
 import { ALLOWED_BOT_CATEGORIES, BLOCKED_CRAWLERS } from "@modules/crawlers";
 
 const CACHEABLE_PATHS = [/^\/$/, /^\/show$/, /^\/ask$/, /^\/item\/\d+$/];
-const PERSONALIZATION_COOKIES = ["theme", "zoom", "bookmarks"];
 const BLOCKED_AGENTS = BLOCKED_CRAWLERS.map((agent) => agent.toLowerCase());
 const ALLOWED_CATEGORIES = new Set(ALLOWED_BOT_CATEGORIES);
 

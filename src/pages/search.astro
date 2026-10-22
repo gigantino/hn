@@ -3,6 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import makeSearch from "@modules/makeSearch";
+import { getBookmarkedIds } from "@modules/bookmarks";
 
 const query = Astro.url.searchParams.get("q") || "";
 const rawPage = parseInt(Astro.url.searchParams.get("page") || "1", 10);
@@ -17,13 +18,7 @@ if (query && totalPages > 0 && page > totalPages) {
   return Astro.redirect(`/search?q=${encodeURIComponent(query)}&page=${totalPages}`);
 }
 
-// Get bookmarked IDs from cookie
-const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
-const bookmarkedIds = new Set(
-  bookmarkCookie
-    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
-    : []
-);
+const bookmarkedIds = getBookmarkedIds(Astro.cookies);
 ---
 
 <Layout title={`${query} on HackerNews`}>

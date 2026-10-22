@@ -1,6 +1,5 @@
+import { PERSONALIZATION_COOKIES } from "@modules/cookies";
 import type { AstroCookies } from "astro";
-
-const PERSONALIZATION_COOKIES = ["theme", "zoom", "bookmarks"];
 
 export const applyEdgeCache = (
   cookies: AstroCookies,

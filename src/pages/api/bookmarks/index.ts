@@ -1,82 +1,44 @@
 import type { APIRoute } from "astro";
+import { getBookmarks, saveBookmarks } from "@modules/bookmarks";
 
-// Helper to parse bookmarks from cookie
-const parseBookmarks = (cookieValue: string | undefined): number[] => {
-  if (!cookieValue) return [];
-  return cookieValue
-    .split(",")
-    .map((id) => parseInt(id, 10))
-    .filter((id) => !isNaN(id));
-};
-
-// Helper to serialize bookmarks to cookie value
-const serializeBookmarks = (bookmarks: number[]): string => {
-  return [...new Set(bookmarks)].join(",");
+const parseImport = async (file: File | null): Promise<number[] | null> => {
+  if (!file || file.size === 0) return null;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!Array.isArray(data.bookmarks)) return null;
+    return data.bookmarks
+      .map((id: unknown) => (typeof id === "number" ? id : parseInt(String(id), 10)))
+      .filter((id: number) => !isNaN(id));
+  } catch {
+    return null;
+  }
 };
 
 export const POST: APIRoute = async ({ request, redirect, cookies }) => {
-  const contentType = request.headers.get("content-type") || "";
-  let action: string | null = null;
-  let id: number | null = null;
-  let redirectUrl = "/bookmarks";
-  let importedBookmarks: number[] | null = null;
+  const isUpload = (request.headers.get("content-type") || "").includes("multipart/form-data");
+  const formData = await request.formData();
+  const action = formData.get("action")?.toString() || null;
+  const redirectUrl = formData.get("redirect")?.toString() || "/bookmarks";
+  const idStr = isUpload ? undefined : formData.get("id")?.toString();
+  const id = idStr ? parseInt(idStr, 10) : NaN;
 
-  if (contentType.includes("multipart/form-data")) {
-    // Handle file import
-    const formData = await request.formData();
-    action = formData.get("action")?.toString() || null;
-    redirectUrl = formData.get("redirect")?.toString() || "/bookmarks";
+  let bookmarks = getBookmarks(cookies);
 
-    if (action === "import") {
-      const file = formData.get("file") as File | null;
-      if (file && file.size > 0) {
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (Array.isArray(data.bookmarks)) {
-            importedBookmarks = data.bookmarks
-              .map((id: unknown) => (typeof id === "number" ? id : parseInt(String(id), 10)))
-              .filter((id: number) => !isNaN(id));
-          }
-        } catch {
-          // Invalid JSON, ignore import
-        }
-      }
-    }
-  } else {
-    // Handle regular form data
-    const formData = await request.formData();
-    action = formData.get("action")?.toString() || null;
-    const idStr = formData.get("id")?.toString();
-    id = idStr ? parseInt(idStr, 10) : null;
-    redirectUrl = formData.get("redirect")?.toString() || "/bookmarks";
-  }
-
-  // Get current bookmarks
-  let bookmarks = parseBookmarks(cookies.get("bookmarks")?.value);
-
-  // Process action
-  if (action === "add" && id && !isNaN(id)) {
-    if (!bookmarks.includes(id)) {
-      bookmarks.unshift(id); // Add to beginning (most recent first)
-    }
-  } else if (action === "remove" && id && !isNaN(id)) {
+  if (action === "add" && id) {
+    if (!bookmarks.includes(id)) bookmarks.unshift(id);
+  } else if (action === "remove" && id) {
     bookmarks = bookmarks.filter((bid) => bid !== id);
-  } else if (action === "import" && importedBookmarks) {
-    // Merge imported bookmarks (imported first, then existing)
-    const existing = new Set(bookmarks);
-    const newBookmarks = importedBookmarks.filter((id) => !existing.has(id));
-    bookmarks = [...newBookmarks, ...bookmarks];
+  } else if (action === "import") {
+    const imported = isUpload ? await parseImport(formData.get("file") as File | null) : null;
+    if (imported) {
+      const existing = new Set(bookmarks);
+      bookmarks = [...imported.filter((bid) => !existing.has(bid)), ...bookmarks];
+    }
   } else if (action === "clear") {
     bookmarks = [];
   }
 
-  // Set cookie (1 year expiry)
-  cookies.set("bookmarks", serializeBookmarks(bookmarks), {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-  });
+  saveBookmarks(cookies, bookmarks);
 
   return redirect(redirectUrl, 303);
 };

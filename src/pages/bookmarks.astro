@@ -2,16 +2,10 @@
 import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
+import { getBookmarks } from "@modules/bookmarks";
 import type { HNItem } from "@/types/hn";
 
-// Parse bookmarks from cookie
-const cookieValue = Astro.cookies.get("bookmarks")?.value;
-const bookmarkIds = cookieValue
-  ? cookieValue
-      .split(",")
-      .map((id) => parseInt(id, 10))
-      .filter((id) => !isNaN(id))
-  : [];
+const bookmarkIds = getBookmarks(Astro.cookies);
 
 const bookmarkSet = new Set(bookmarkIds);
 

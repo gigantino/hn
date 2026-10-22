@@ -16,13 +16,6 @@ export interface HNItem {
   descendants?: number;
 }
 
-export interface HNStory extends HNItem {
-  type: "story";
-  title: string;
-  score: number;
-  descendants: number;
-}
-
 export interface HNComment {
   id: number;
   text: string;

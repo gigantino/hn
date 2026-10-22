@@ -4,33 +4,40 @@ import Filters from "@components/Filters.astro";
 import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
 import { getCanonicalUrl } from "@modules/canonical";
-import validateZoom from "@modules/zoom";
+import validateZoom, { defaultZoom } from "@modules/zoom";
 import { SITE_NAME, isIndexable, websiteJsonLd } from "@modules/seo";
 import "../styles/global.css";
 
 export interface Props {
   title?: string;
   description?: string;
+  filters?: boolean;
+  article?: {
+    author?: string;
+    score?: number;
+    comments?: number;
+  };
 }
 
+const { filters = false, article } = Astro.props;
 const { title, description } = getMetaTags(Astro.props.title, Astro.props.description);
 const indexable = isIndexable(Astro.url);
 const isHome = Astro.url.pathname === "/" && indexable;
 
 const canonicalUrl = getCanonicalUrl(Astro.url);
 
-// Build OG image URL
 const ogImageParams = new URLSearchParams();
 ogImageParams.set("title", Astro.props.title ?? "Hacker News");
+if (article?.author) ogImageParams.set("author", article.author);
+if (article?.score !== undefined) ogImageParams.set("score", String(article.score));
+if (article?.comments !== undefined) ogImageParams.set("comments", String(article.comments));
 const ogImageUrl = new URL(`/api/og?${ogImageParams.toString()}`, Astro.url.origin).toString();
 
-// Get theme from cookie
 const theme = Astro.cookies.get("theme")?.value || "system";
-// Apply class: "light" forces light, "dark" forces dark, "system" = no class (uses media query)
 const themeClass = theme === "system" ? "" : theme;
 
 const zoom = validateZoom(Astro.cookies.get("zoom")?.value);
-const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
+const zoomStyle = zoom === defaultZoom ? undefined : `font-size: ${zoom}%;`;
 ---
 
 <!doctype html>
@@ -47,7 +54,7 @@ const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
     {isHome && <script type="application/ld+json" set:html={websiteJsonLd} />}
     <!-- Open Graph -->
     <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={article ? "article" : "website"} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageUrl} />
@@ -61,18 +68,18 @@ const zoomStyle = zoom === "100" ? undefined : `font-size: ${zoom}%;`;
   </head>
   <body class="min-w-fold bg-gray-100 text-neutral-900 dark:bg-neutral-900 dark:text-white">
     <Navigation />
-    <main
-      class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-gray-200 p-3 dark:border-neutral-500/40 md:border-x"
-    >
-      <!-- Show filters on all pages using this layout other than profiles, search, settings, bookmarks -->
-      {
-        !Astro.url.pathname.startsWith("/@") &&
-          !Astro.url.pathname.startsWith("/search") &&
-          !Astro.url.pathname.startsWith("/settings") &&
-          !Astro.url.pathname.startsWith("/bookmarks") && <Filters />
-      }
-      <slot />
-    </main>
+    {
+      article ? (
+        <div class="px-3 py-6">
+          <slot />
+        </div>
+      ) : (
+        <main class="m-auto flex w-full max-w-screen-md flex-col gap-3 border-gray-200 p-3 dark:border-neutral-500/40 md:border-x">
+          {filters && <Filters />}
+          <slot />
+        </main>
+      )
+    }
     <Footer />
   </body>
 </html>

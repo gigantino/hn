@@ -1,18 +1,12 @@
-import validateZoom from "@modules/zoom";
 import type { APIRoute } from "astro";
+import { setPreferenceCookie } from "@modules/cookies";
+import validateZoom from "@modules/zoom";
 
 export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   const formData = await request.formData();
-  const zoom = formData.get("zoom")?.toString();
   const redirectUrl = formData.get("redirect")?.toString() || "/settings";
 
-  const validatedZoom = validateZoom(zoom);
-
-  cookies.set("zoom", validatedZoom, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-  });
+  setPreferenceCookie(cookies, "zoom", validateZoom(formData.get("zoom")?.toString()));
 
   return redirect(redirectUrl, 303);
 };

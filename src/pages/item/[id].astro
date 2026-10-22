@@ -1,11 +1,12 @@
 ---
-import ItemLayout from "@layouts/ItemLayout.astro";
+import Layout from "@layouts/Layout.astro";
 import Comment from "@components/Comment.astro";
 import Story from "@components/Story.astro";
 import Pagination from "@components/Pagination.astro";
 import { applyEdgeCache } from "@modules/cache";
 import getItem from "@modules/getItem";
 import type { HNComment, HNItem } from "@/types/hn";
+import { getBookmarkedIds } from "@modules/bookmarks";
 
 const { id } = Astro.params;
 
@@ -59,12 +60,7 @@ const getComment = async (commentId: number, depth: number = 0): Promise<HNComme
 const post = await getItem(Number(id), { ctx });
 if (!post) return Astro.redirect("/404");
 
-const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
-const bookmarkedIds = new Set(
-  bookmarkCookie
-    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
-    : []
-);
+const bookmarkedIds = getBookmarkedIds(Astro.cookies);
 
 let parentStory: HNItem | null = null;
 let topLevelCommentId: number | null = null;
@@ -113,7 +109,7 @@ if (truncated) {
 }
 ---
 
-<ItemLayout title={post.title || `Item ${post.id}`} description={post.text} author={post.by} score={post.score} comments={post.descendants}>
+<Layout title={post.title || `Item ${post.id}`} description={post.text} article={{ author: post.by, score: post.score, comments: post.descendants }}>
   {post.type === "story" && <Story data={post} bookmarkedIds={bookmarkedIds} />}
 
   {post.type === "comment" && (
@@ -163,4 +159,4 @@ if (truncated) {
       <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/item/${id}`} />
     </div>
   )}
-</ItemLayout>
+</Layout>
