@@ -6,6 +6,7 @@ import Pagination from "@components/Pagination.astro";
 import { applyEdgeCache } from "@modules/cache";
 import getItem from "@modules/getItem";
 import type { HNComment, HNItem } from "@/types/hn";
+import { getBookmarkedIds } from "@modules/bookmarks";
 
 const { id } = Astro.params;
 
@@ -59,12 +60,7 @@ const getComment = async (commentId: number, depth: number = 0): Promise<HNComme
 const post = await getItem(Number(id), { ctx });
 if (!post) return Astro.redirect("/404");
 
-const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
-const bookmarkedIds = new Set(
-  bookmarkCookie
-    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
-    : []
-);
+const bookmarkedIds = getBookmarkedIds(Astro.cookies);
 
 let parentStory: HNItem | null = null;
 let topLevelCommentId: number | null = null;

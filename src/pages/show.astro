@@ -5,18 +5,13 @@ import Pagination from "@components/Pagination.astro";
 import getPage from "@modules/getPage";
 import { applyEdgeCache } from "@modules/cache";
 import { getListingTitle } from "@modules/seo";
+import { getBookmarkedIds } from "@modules/bookmarks";
 
 const req = await fetch(`${import.meta.env.HN_API}/showstories.json`);
 const page = getPage(Astro);
 const filter = Astro.url.searchParams.get("filter");
 
-// Get bookmarked IDs from cookie
-const bookmarkCookie = Astro.cookies.get("bookmarks")?.value;
-const bookmarkedIds = new Set(
-  bookmarkCookie
-    ? bookmarkCookie.split(",").map((id) => parseInt(id, 10)).filter((id) => !isNaN(id))
-    : []
-);
+const bookmarkedIds = getBookmarkedIds(Astro.cookies);
 
 const data: undefined | number[] = await req.json();
 if (!data) return Astro.redirect("/404");
