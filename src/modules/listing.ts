@@ -5,7 +5,7 @@ import type { HNItem } from "@/types/hn";
 const ITEMS_PER_PAGE = 20;
 
 const loadListing = async (Astro: AstroGlobal, basePath: string, list: string) => {
-  const page = getPage(Astro);
+  const page = getPage(Astro.url);
   const filter = Astro.url.searchParams.get("filter");
 
   const data: undefined | number[] = await (await fetch(`${import.meta.env.HN_API}/${list}.json`)).json();

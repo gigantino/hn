@@ -1,8 +1,6 @@
-import type { AstroGlobal } from "astro";
-
-const getPage = (Astro: Readonly<AstroGlobal<Record<string, any>>>) => {
-  const rawPage = Number(Astro.url.searchParams.get("page"));
-  return isNaN(rawPage) || rawPage <= 1 ? 1 : rawPage;
+const getPage = (url: URL) => {
+  const page = parseInt(url.searchParams.get("page") ?? "", 10);
+  return isNaN(page) || page < 1 ? 1 : page;
 };
 
 export default getPage;
