@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { BLOCKED_CRAWLERS } from "@modules/crawlers";
+import { SITE_URL } from "@modules/seo";
 
 export const prerender = true;
 
@@ -16,7 +17,7 @@ Disallow: /bookmarks
 Disallow: /search
 Disallow: /@
 
-Sitemap: https://hn.ggtn.ch/sitemap.xml
+Sitemap: ${SITE_URL}/sitemap.xml
 `;
 
 export const GET: APIRoute = () =>

@@ -6,7 +6,7 @@ const extractDomainFromLink = (link: string) => {
       hostnameParts.shift();
     }
     return hostnameParts.join(".");
-  } catch (error) {
+  } catch {
     return undefined;
   }
 };

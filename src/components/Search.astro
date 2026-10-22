@@ -1,11 +1,5 @@
 ---
 import SearchIcon from "@components/icons/Search.astro";
-
-interface Props {
-  query?: string;
-}
-
-const { query } = Astro.props;
 ---
 
 <form class="flex w-full justify-center" method="get" action="/search">
@@ -15,7 +9,6 @@ const { query } = Astro.props;
     placeholder="Search..."
     name="q"
     id="q"
-    value={query}
   />
   <button type="submit" class="rounded-tr-md border border-gray-300 p-2 dark:border-neutral-500/40">
     <SearchIcon />
