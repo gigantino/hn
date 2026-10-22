@@ -69,7 +69,7 @@ let commentPageNumber: number = 1;
 
 if (post.type === "comment" && post.parent) {
   let currentId = post.id;
-  let currentParentId = post.parent;
+  let currentParentId: number | undefined = post.parent;
 
   while (currentParentId) {
     const parent = await getWithinDeadline(currentParentId);
