@@ -21,11 +21,12 @@ const loadListing = async (Astro: AstroGlobal, basePath: string, list: string) =
   }
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const posts: HNItem[] = await Promise.all(
+  const items: (HNItem | null)[] = await Promise.all(
     data
       .slice(startIndex, startIndex + ITEMS_PER_PAGE)
       .map(async (id) => (await fetch(`${import.meta.env.HN_API}/item/${id}.json`)).json()),
   );
+  const posts = items.filter((item): item is HNItem => !!item && !item.deleted && !item.dead);
 
   if (posts.length == 0 && page === 1) return Astro.redirect("/404");
 
