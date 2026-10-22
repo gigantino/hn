@@ -5,13 +5,14 @@ import Story from "@components/Story.astro";
 import Pagination from "@components/Pagination.astro";
 import { applyEdgeCache } from "@modules/cache";
 import getItem from "@modules/getItem";
+import getPage from "@modules/getPage";
 import type { HNComment, HNItem } from "@/types/hn";
 import { getBookmarkedIds } from "@modules/bookmarks";
 
 const { id } = Astro.params;
 
 const commentsPerPage = 10;
-const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get("page") || "1"));
+const currentPage = getPage(Astro.url);
 const fromPage = parseInt(Astro.url.searchParams.get("fromPage") || "0");
 const fromComment = Astro.url.searchParams.get("fromComment") || "";
 
@@ -68,7 +69,7 @@ let commentPageNumber: number = 1;
 
 if (post.type === "comment" && post.parent) {
   let currentId = post.id;
-  let currentParentId = post.parent;
+  let currentParentId: number | undefined = post.parent;
 
   while (currentParentId) {
     const parent = await getWithinDeadline(currentParentId);

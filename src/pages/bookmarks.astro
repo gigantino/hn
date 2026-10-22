@@ -3,6 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import ItemPreview from "@components/ItemPreview.astro";
 import Pagination from "@components/Pagination.astro";
 import { getBookmarks } from "@modules/bookmarks";
+import getPage from "@modules/getPage";
 import type { HNItem } from "@/types/hn";
 
 const bookmarkIds = getBookmarks(Astro.cookies);
@@ -11,7 +12,7 @@ const bookmarkSet = new Set(bookmarkIds);
 
 // Pagination
 const itemsPerPage = 20;
-const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get("page") || "1"));
+const currentPage = getPage(Astro.url);
 const totalPages = Math.ceil(bookmarkIds.length / itemsPerPage);
 
 // Redirect to last valid page if out of bounds

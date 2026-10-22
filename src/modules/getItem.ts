@@ -5,7 +5,7 @@ const COMMENT_MAX_AGE = 300;
 
 interface Options {
   signal?: AbortSignal;
-  ctx?: ExecutionContext;
+  ctx?: { waitUntil(promise: Promise<unknown>): void };
 }
 
 const getItem = async (id: number, { signal, ctx }: Options = {}): Promise<HNItem | null> => {

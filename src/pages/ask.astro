@@ -16,7 +16,7 @@ const bookmarkedIds = getBookmarkedIds(Astro.cookies);
 applyEdgeCache(Astro.cookies, Astro.response, 60);
 ---
 
-<Layout filters title={getListingTitle("Ask HN", Astro.url)} description="Ask HN: questions and discussions from the Hacker News community.">
+<Layout title={getListingTitle("Ask HN", Astro.url)} description="Ask HN: questions and discussions from the Hacker News community.">
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={baseUrl} />
   <div class="flex flex-col gap-3">
     {posts.map((post) => <ItemPreview data={post} bookmarkedIds={bookmarkedIds} />)}

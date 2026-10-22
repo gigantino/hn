@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import formRedirect from "@modules/formRedirect";
 import { getBookmarks, saveBookmarks } from "@modules/bookmarks";
 
 const parseImport = async (file: File | null): Promise<number[] | null> => {
@@ -18,7 +19,7 @@ export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   const isUpload = (request.headers.get("content-type") || "").includes("multipart/form-data");
   const formData = await request.formData();
   const action = formData.get("action")?.toString() || null;
-  const redirectUrl = formData.get("redirect")?.toString() || "/bookmarks";
+  const redirectUrl = formRedirect(formData, "/bookmarks");
   const idStr = isUpload ? undefined : formData.get("id")?.toString();
   const id = idStr ? parseInt(idStr, 10) : NaN;
 

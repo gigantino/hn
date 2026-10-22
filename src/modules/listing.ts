@@ -4,9 +4,8 @@ import type { HNItem } from "@/types/hn";
 
 const ITEMS_PER_PAGE = 20;
 
-const loadListing = async (Astro: AstroGlobal, basePath: string, list: string) => {
-  const page = getPage(Astro);
-  const filter = Astro.url.searchParams.get("filter");
+const loadListing = async (Astro: AstroGlobal, basePath: string, list: string, filter?: string | null) => {
+  const page = getPage(Astro.url);
 
   const data: undefined | number[] = await (await fetch(`${import.meta.env.HN_API}/${list}.json`)).json();
   if (!data) return Astro.redirect("/404");
@@ -21,11 +20,12 @@ const loadListing = async (Astro: AstroGlobal, basePath: string, list: string) =
   }
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const posts: HNItem[] = await Promise.all(
+  const items: (HNItem | null)[] = await Promise.all(
     data
       .slice(startIndex, startIndex + ITEMS_PER_PAGE)
       .map(async (id) => (await fetch(`${import.meta.env.HN_API}/item/${id}.json`)).json()),
   );
+  const posts = items.filter((item): item is HNItem => !!item && !item.deleted && !item.dead);
 
   if (posts.length == 0 && page === 1) return Astro.redirect("/404");
 
