@@ -1,9 +1,9 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import validateZoom, { zoomLevels } from "@modules/zoom";
+import validateTheme from "@modules/theme";
 
-// Get current theme from cookie
-const theme = Astro.cookies.get("theme")?.value || "system";
+const theme = validateTheme(Astro.cookies.get("theme")?.value);
 
 const zoom = validateZoom(Astro.cookies.get("zoom")?.value);
 ---

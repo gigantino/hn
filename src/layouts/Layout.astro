@@ -5,6 +5,7 @@ import Footer from "@components/Footer.astro";
 import getMetaTags from "@modules/getMetaTags";
 import { getCanonicalUrl } from "@modules/canonical";
 import validateZoom, { defaultZoom } from "@modules/zoom";
+import validateTheme, { defaultTheme } from "@modules/theme";
 import { SITE_NAME, isIndexable, websiteJsonLd } from "@modules/seo";
 import "../styles/global.css";
 
@@ -33,8 +34,8 @@ if (article?.score !== undefined) ogImageParams.set("score", String(article.scor
 if (article?.comments !== undefined) ogImageParams.set("comments", String(article.comments));
 const ogImageUrl = new URL(`/api/og?${ogImageParams.toString()}`, Astro.url.origin).toString();
 
-const theme = Astro.cookies.get("theme")?.value || "system";
-const themeClass = theme === "system" ? "" : theme;
+const theme = validateTheme(Astro.cookies.get("theme")?.value);
+const themeClass = theme === defaultTheme ? "" : theme;
 
 const zoom = validateZoom(Astro.cookies.get("zoom")?.value);
 const zoomStyle = zoom === defaultZoom ? undefined : `font-size: ${zoom}%;`;
